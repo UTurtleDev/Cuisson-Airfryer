@@ -7,6 +7,7 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
+    TemplateView,
     UpdateView,
     View,
 )
@@ -78,7 +79,7 @@ class DetailPlatView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         contexte = super().get_context_data(**kwargs)
-        contexte["tests"] = self.object.tests.all()
+        contexte["tests"] = self.object.tests_numerotes()
         contexte["est_proprietaire"] = self.object.appartient_a(self.request.user)
         return contexte
 
@@ -220,6 +221,57 @@ class DefinirMeilleurTestView(PlatProprietaireRequisMixin, SingleObjectMixin, Vi
             return render(
                 requete,
                 "plats/partiels/historique.html",
-                {"plat": plat, "tests": plat.tests.all(), "est_proprietaire": True},
+                {"plat": plat, "tests": plat.tests_numerotes(), "est_proprietaire": True},
             )
         return redirect(plat.get_absolute_url())
+
+
+class ComparerTestsView(LoginRequiredMixin, TemplateView):
+    """Comparaison de plusieurs essais d'un même plat.
+
+    La sélection arrive par l'URL (?test=1&test=2). Les identifiants qui ne
+    correspondent pas à un test de ce plat sont simplement ignorés : la
+    comparaison ne peut donc jamais mélanger deux plats.
+    """
+
+    template_name = "plats/comparaison.html"
+    template_name_fragment = "plats/partiels/comparaison.html"
+    MINIMUM_A_COMPARER = 2
+
+    def get_plat(self):
+        if not hasattr(self, "_plat"):
+            self._plat = get_object_or_404(
+                Plat.objects.visibles().avec_details(), slug=self.kwargs["slug"]
+            )
+        return self._plat
+
+    def identifiants_demandes(self):
+        """Identifiants valides passés dans l'URL, sans les valeurs fantaisistes."""
+        return {
+            int(valeur)
+            for valeur in self.request.GET.getlist("test")
+            if valeur.isdigit()
+        }
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request"):
+            return [self.template_name_fragment]
+        return [self.template_name]
+
+    def get_context_data(self, **kwargs):
+        contexte = super().get_context_data(**kwargs)
+        plat = self.get_plat()
+        demandes = self.identifiants_demandes()
+
+        # tests_numerotes conserve la numérotation des essais du plat entier,
+        # et écarte au passage tout identifiant étranger au plat.
+        selection = [test for test in plat.tests_numerotes() if test.pk in demandes]
+        selection.reverse()
+
+        contexte["plat"] = plat
+        contexte["tests"] = selection
+        contexte["selection_insuffisante"] = len(selection) < self.MINIMUM_A_COMPARER
+        contexte["minimum_a_comparer"] = self.MINIMUM_A_COMPARER
+        contexte["note_maximum"] = max((test.note for test in selection), default=None)
+        contexte["est_proprietaire"] = plat.appartient_a(self.request.user)
+        return contexte

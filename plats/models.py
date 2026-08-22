@@ -126,6 +126,18 @@ class Plat(models.Model):
     def appartient_a(self, utilisateur):
         return utilisateur.is_authenticated and self.proprietaire_id == utilisateur.pk
 
+    def tests_numerotes(self):
+        """Tests du plus récent au plus ancien, numérotés dans l'ordre des essais.
+
+        Le premier essai réalisé porte le numéro 1, quel que soit l'ordre
+        d'affichage : c'est le repère naturel quand on compare des essais.
+        """
+        tests = list(self.tests.all())
+        total = len(tests)
+        for rang, test in enumerate(tests):
+            test.numero = total - rang
+        return tests
+
     def definir_meilleur_test(self, test):
         """Désigne manuellement la meilleure combinaison de cuisson.
 

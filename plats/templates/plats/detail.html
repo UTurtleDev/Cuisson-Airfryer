@@ -46,5 +46,12 @@
         {% endif %}
 
         {% include "plats/partiels/historique.html" %}
+
+        {% comment %}
+            Cible du tableau comparatif. Volontairement hors du fragment
+            historique : celui-ci est remplacé entier par HTMX quand la
+            meilleure combinaison change.
+        {% endcomment %}
+        <section id="comparaison" class="comparaison"></section>
     </article>
 {% endblock %}

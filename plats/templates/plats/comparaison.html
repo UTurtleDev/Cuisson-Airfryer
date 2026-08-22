@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block titre %}Comparaison - {{ plat.nom }}{% endblock %}
+
+{% block contenu %}
+    <h1>Comparer les essais de {{ plat.nom }}</h1>
+    <p><a href="{{ plat.get_absolute_url }}">Retour à {{ plat.nom }}</a></p>
+
+    {% if selection_insuffisante and not tests %}
+        <p>Aucun essai sélectionné. Choisissez-en au moins
+        {{ minimum_a_comparer }} depuis l'historique du plat.</p>
+    {% endif %}
+
+    {% include "plats/partiels/comparaison.html" %}
+{% endblock %}

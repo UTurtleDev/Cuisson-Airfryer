@@ -151,3 +151,39 @@ a {
 .htmx-request.htmx-indicator {
     opacity: 1;
 }
+
+.visuellement-cache {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.tableau-comparaison {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.tableau-comparaison th,
+.tableau-comparaison td {
+    border: 1px solid var(--bordure);
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.note--haute {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.marque-meilleur {
+    color: var(--accent);
+}
+
+.rappel {
+    color: var(--texte-discret);
+    font-size: 0.9rem;
+}

@@ -1,0 +1,58 @@
+{% comment %}
+    Tableau comparatif des essais sélectionnés.
+    Fragment renvoyé tel quel par HTMX depuis la fiche du plat.
+{% endcomment %}
+<section id="comparaison" class="comparaison">
+    {% if selection_insuffisante %}
+        {% if tests %}
+            <p>Sélectionnez au moins {{ minimum_a_comparer }} essais pour les comparer.</p>
+        {% endif %}
+    {% else %}
+        <h2>Comparaison de {{ tests|length }} essais</h2>
+        <table class="tableau-comparaison">
+            <thead>
+                <tr>
+                    <th>Essai</th>
+                    <th>Date</th>
+                    <th>Température</th>
+                    <th>Durée</th>
+                    <th>Note</th>
+                    <th>Résultat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for test in tests %}
+                    <tr class="{% if test.est_meilleur %}test--meilleur{% endif %}">
+                        <th scope="row">
+                            #{{ test.numero }}
+                            {% if test.est_meilleur %}
+                                <span class="marque-meilleur" title="Meilleure combinaison">★</span>
+                            {% endif %}
+                        </th>
+                        <td>{{ test.date_test|date:"d/m/Y" }}</td>
+                        <td>{{ test.temperature_celsius }} °C</td>
+                        <td>{{ test.duree_lisible }}</td>
+                        <td class="{% if test.note == note_maximum %}note--haute{% endif %}">
+                            {{ test.get_note_display }}
+                        </td>
+                        <td>{{ test.commentaire|default:"-" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if plat.meilleur_test %}
+            <p class="rappel">
+                Meilleure combinaison retenue pour ce plat :
+                {{ plat.meilleur_test.temperature_celsius }} °C /
+                {{ plat.meilleur_test.duree_lisible }}.
+            </p>
+        {% elif est_proprietaire %}
+            <p class="rappel">
+                Aucune meilleure combinaison n'est encore retenue. La note la mieux
+                placée est mise en évidence, mais le choix vous revient : utilisez le
+                bouton « Meilleure » dans l'historique.
+            </p>
+        {% endif %}
+    {% endif %}
+</section>

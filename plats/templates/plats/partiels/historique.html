@@ -15,9 +15,18 @@
     {% endif %}
 
     {% if tests %}
+        <form
+            class="selection-essais"
+            method="get"
+            action="{% url 'plats:comparer' plat.slug %}"
+            hx-get="{% url 'plats:comparer' plat.slug %}"
+            hx-target="#comparaison"
+            hx-swap="outerHTML">
         <table class="tableau-tests">
             <thead>
                 <tr>
+                    <th><span class="visuellement-cache">Comparer</span></th>
+                    <th>Essai</th>
                     <th>Date</th>
                     <th>Température</th>
                     <th>Durée</th>
@@ -29,6 +38,13 @@
             <tbody>
                 {% for test in tests %}
                     <tr class="{% if test.est_meilleur %}test--meilleur{% endif %}">
+                        <td>
+                            <input type="checkbox" name="test" value="{{ test.pk }}"
+                                   id="essai-{{ test.pk }}">
+                        </td>
+                        <th scope="row">
+                            <label for="essai-{{ test.pk }}">#{{ test.numero }}</label>
+                        </th>
                         <td>{{ test.date_test|date:"d/m/Y" }}</td>
                         <td>{{ test.temperature_celsius }} °C</td>
                         <td>{{ test.duree_lisible }}</td>
@@ -51,6 +67,10 @@
                 {% endfor %}
             </tbody>
         </table>
+        <p class="actions">
+            <button type="submit">Comparer les essais cochés</button>
+        </p>
+        </form>
     {% else %}
         <p>Aucun test enregistré pour ce plat.</p>
     {% endif %}

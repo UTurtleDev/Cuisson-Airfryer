@@ -204,25 +204,25 @@ JavaScript maison : uniquement le menu mobile et l'aperçu d'image avant envoi. 
 
 ## 5. Découpage des lots (un lot = un commit vérifiable)
 
-État : lots 0 à 3 réalisés.
+État : lots 0 à 5 réalisés, 127 tests automatisés au vert.
 
-**Lot 0 — Fondations** (spec phase 1)
+**Lot 0 [fait] — Fondations** (spec phase 1)
 Dépendances, `environ` + `.env`, langue/fuseau, `templates/` et `static/` dans les settings, `base.html` + HTMX, `.gitignore` complet, premier commit.
 
-**Lot 1 — Utilisateurs** (phases 1-2)
+**Lot 1 [fait] — Utilisateurs** (phases 1-2)
 App `users`, `Utilisateur` + gestionnaire, `AUTH_USER_MODEL`, **première migration**, backend email, inscription/connexion/déconnexion/mot de passe oublié/profil, admin utilisateur, tests.
 Migration à faire avant tout autre modèle : y revenir après coup est douloureux.
 
-**Lot 2 — Plats et catégories** (phase 3)
+**Lot 2 [fait] — Plats et catégories** (phase 3)
 Modèles `Categorie` + `Plat`, migration de données des catégories, CRUD complet avec contrôle de propriété, images, liste et détail, admin, tests de permissions.
 
-**Lot 3 — Tests de cuisson** (phase 4)
+**Lot 3 [fait] — Tests de cuisson** (phase 4)
 Modèle `TestCuisson`, CRUD, historique sur la fiche plat, note en étoiles, définition manuelle du meilleur test, tests automatisés (dont : supprimer un test ne casse pas le plat, l'historique est préservé).
 
-**Lot 4 — Recherche, filtres, accueil** (phase 5)
+**Lot 4 [fait] — Recherche, filtres, accueil** (phase 5)
 `PlatQuerySet`, `FiltrePlatForm`, fragments HTMX, page d'accueil (plats avec meilleure combinaison, récents, mieux notés), tests des filtres combinés.
 
-**Lot 5 — Comparaison** (phase 6)
+**Lot 5 [fait] — Comparaison** (phase 6)
 Sélection multiple de tests d'un même plat, tableau comparatif, mise en évidence du meilleur, garde-fou : tous les tests comparés doivent appartenir au même plat.
 
 **Lot 6 — Favoris et copie** (phase 7)
