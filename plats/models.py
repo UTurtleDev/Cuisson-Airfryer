@@ -136,6 +136,11 @@ class Plat(models.Model):
         total = len(tests)
         for rang, test in enumerate(tests):
             test.numero = total - rang
+
+        # La meilleure combinaison remonte en tête de liste, mais garde son
+        # numéro : le numéro dit quand l'essai a été fait, pas son rang.
+        # Le tri est stable, les autres essais conservent leur ordre.
+        tests.sort(key=lambda test: test.pk != self.meilleur_test_id)
         return tests
 
     def definir_meilleur_test(self, test):

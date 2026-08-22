@@ -24,6 +24,24 @@ class NumerotationEssaisTest(TestCase):
         tests = self.plat.tests_numerotes()
         self.assertEqual([test.numero for test in tests], [3, 2, 1])
 
+    def test_la_meilleure_combinaison_s_affiche_en_premier(self):
+        self.plat.definir_meilleur_test(self.deuxieme)
+        tests = self.plat.tests_numerotes()
+        self.assertEqual(tests[0], self.deuxieme)
+
+    def test_les_numeros_ne_changent_pas_avec_le_classement(self):
+        """Remonter la meilleure en tête ne renumérote pas les essais."""
+        self.plat.definir_meilleur_test(self.deuxieme)
+        numeros = {test.pk: test.numero for test in self.plat.tests_numerotes()}
+        self.assertEqual(numeros[self.premier.pk], 1)
+        self.assertEqual(numeros[self.deuxieme.pk], 2)
+        self.assertEqual(numeros[self.troisieme.pk], 3)
+
+    def test_les_autres_essais_gardent_leur_ordre(self):
+        self.plat.definir_meilleur_test(self.deuxieme)
+        tests = self.plat.tests_numerotes()
+        self.assertEqual([test.numero for test in tests], [2, 3, 1])
+
 
 class ComparaisonTest(TestCase):
     def setUp(self):

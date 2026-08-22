@@ -239,3 +239,41 @@ class AffichageHistoriqueTest(TestCase):
         self.assertContains(reponse, "Historique des tests")
         self.assertNotContains(reponse, "Ajouter un test de cuisson")
         self.assertNotContains(reponse, "hx-post")
+
+
+class LibellesHistoriqueTest(TestCase):
+    """L'historique ne doit pas laisser croire qu'un bouton est une étiquette."""
+
+    def setUp(self):
+        self.membre = creer_membre()
+        self.plat = creer_plat(self.membre)
+        self.retenu = creer_test(self.plat, temperature=190)
+        self.autre_essai = creer_test(self.plat, temperature=180)
+        self.plat.definir_meilleur_test(self.retenu)
+        self.client.force_login(self.membre)
+
+    def contenu(self):
+        return self.client.get(self.plat.get_absolute_url()).content.decode()
+
+    def test_action_explicite_sur_les_essais_non_retenus(self):
+        self.assertIn("Choisir comme meilleure", self.contenu())
+
+    def test_action_explicite_sur_l_essai_retenu(self):
+        self.assertIn("Ne plus retenir", self.contenu())
+
+    def test_ancien_libelle_ambigu_absent(self):
+        contenu = self.contenu()
+        self.assertNotIn(">Retirer<", contenu)
+        self.assertNotIn(">Meilleure<", contenu)
+
+    def test_etiquette_sur_la_ligne_retenue(self):
+        self.assertIn("★ Meilleure", self.contenu())
+
+    def test_une_seule_etiquette_dans_le_tableau(self):
+        self.assertEqual(self.contenu().count("etiquette-meilleur"), 1)
+
+    def test_essai_retenu_affiche_en_premier(self):
+        contenu = self.contenu()
+        position_retenu = contenu.index(f'value="{self.retenu.pk}"')
+        position_autre = contenu.index(f'value="{self.autre_essai.pk}"')
+        self.assertLess(position_retenu, position_autre)

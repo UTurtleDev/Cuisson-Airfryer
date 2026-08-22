@@ -187,3 +187,20 @@ a {
     color: var(--texte-discret);
     font-size: 0.9rem;
 }
+
+.etiquette-meilleur {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 1rem;
+    background: var(--accent);
+    color: var(--fond);
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.bouton--retirer {
+    font-weight: 400;
+    opacity: 0.75;
+}

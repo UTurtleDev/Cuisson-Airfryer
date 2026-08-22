@@ -44,6 +44,9 @@
                         </td>
                         <th scope="row">
                             <label for="essai-{{ test.pk }}">#{{ test.numero }}</label>
+                            {% if test.est_meilleur %}
+                                <span class="etiquette-meilleur">★ Meilleure</span>
+                            {% endif %}
                         </th>
                         <td>{{ test.date_test|date:"d/m/Y" }}</td>
                         <td>{{ test.temperature_celsius }} °C</td>
@@ -54,10 +57,15 @@
                             <td class="actions">
                                 <button
                                     type="button"
+                                    class="{% if test.est_meilleur %}bouton--retirer{% endif %}"
                                     hx-post="{% url 'plats:definir_meilleur_test' test.pk %}"
                                     hx-target="#historique"
                                     hx-swap="outerHTML">
-                                    {% if test.est_meilleur %}Retirer{% else %}Meilleure{% endif %}
+                                    {% if test.est_meilleur %}
+                                        Ne plus retenir
+                                    {% else %}
+                                        Choisir comme meilleure
+                                    {% endif %}
                                 </button>
                                 <a href="{% url 'plats:modifier_test' test.pk %}">Modifier</a>
                                 <a href="{% url 'plats:supprimer_test' test.pk %}">Supprimer</a>

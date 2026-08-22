@@ -266,7 +266,8 @@ class ComparerTestsView(LoginRequiredMixin, TemplateView):
         # tests_numerotes conserve la numérotation des essais du plat entier,
         # et écarte au passage tout identifiant étranger au plat.
         selection = [test for test in plat.tests_numerotes() if test.pk in demandes]
-        selection.reverse()
+        # Dans le tableau comparatif, on suit l'ordre des essais : #1, #2, #3.
+        selection.sort(key=lambda test: test.numero)
 
         contexte["plat"] = plat
         contexte["tests"] = selection
