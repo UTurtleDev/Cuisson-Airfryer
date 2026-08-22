@@ -17,12 +17,28 @@ class PlatQuerySet(models.QuerySet):
 
     def avec_details(self):
         """Précharge propriétaire et catégories pour éviter les requêtes N+1."""
-        return self.select_related("proprietaire").prefetch_related("categories")
+        return self.select_related("proprietaire", "meilleur_test").prefetch_related(
+            "categories"
+        )
 
     def recherche(self, terme):
         if not terme:
             return self
         return self.filter(models.Q(nom__icontains=terme) | models.Q(description__icontains=terme))
+
+    def avec_meilleur_test(self):
+        """Ne garde que les plats dont la meilleure combinaison est désignée."""
+        return self.filter(meilleur_test__isnull=False)
+
+    def duree_cuisson_maximum(self, minutes):
+        """Filtre sur la durée de la meilleure combinaison du plat.
+
+        Les plats sans meilleure combinaison désignée sont écartés : sans
+        elle, aucune durée ne fait référence.
+        """
+        if not minutes:
+            return self
+        return self.filter(meilleur_test__duree_minutes__lte=minutes)
 
     def par_categories(self, categories):
         if not categories:

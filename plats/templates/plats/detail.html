@@ -41,6 +41,10 @@
             </p>
         {% endif %}
 
-        {# Historique des tests de cuisson : lot 3. #}
+        {% if est_proprietaire %}
+            <p><a href="{% url 'plats:creer_test' plat.slug %}">Ajouter un test de cuisson</a></p>
+        {% endif %}
+
+        {% include "plats/partiels/historique.html" %}
     </article>
 {% endblock %}

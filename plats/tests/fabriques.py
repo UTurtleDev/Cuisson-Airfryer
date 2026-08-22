@@ -2,7 +2,7 @@
 
 from django.contrib.auth import get_user_model
 
-from plats.models import Plat
+from plats.models import Plat, TestCuisson
 
 Utilisateur = get_user_model()
 
@@ -15,3 +15,13 @@ def creer_membre(email="membre@exemple.fr", **champs):
 
 def creer_plat(proprietaire, nom="Hamburger", **champs):
     return Plat.objects.create(proprietaire=proprietaire, nom=nom, **champs)
+
+
+def creer_test(plat, temperature=180, duree=12, note=3, **champs):
+    return TestCuisson.objects.create(
+        plat=plat,
+        temperature_celsius=temperature,
+        duree_minutes=duree,
+        note=note,
+        **champs,
+    )

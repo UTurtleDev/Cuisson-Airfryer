@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 
 from plats.managers import PlatQuerySet
@@ -66,6 +68,16 @@ class Plat(models.Model):
         "temps de préparation (minutes)", null=True, blank=True
     )
 
+    meilleur_test = models.ForeignKey(
+        "TestCuisson",
+        verbose_name="meilleure combinaison",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Test choisi manuellement comme meilleure cuisson de ce plat.",
+    )
+
     plat_origine = models.ForeignKey(
         "self",
         verbose_name="plat d'origine",
@@ -113,3 +125,77 @@ class Plat(models.Model):
 
     def appartient_a(self, utilisateur):
         return utilisateur.is_authenticated and self.proprietaire_id == utilisateur.pk
+
+    def definir_meilleur_test(self, test):
+        """Désigne manuellement la meilleure combinaison de cuisson.
+
+        Le test doit appartenir à ce plat. Un plat ne pointe qu'un seul
+        meilleur test : l'unicité est structurelle, aucun test n'a de drapeau
+        à maintenir de son côté.
+        """
+        if test is not None and test.plat_id != self.pk:
+            raise ValueError("Ce test de cuisson n'appartient pas à ce plat.")
+        self.meilleur_test = test
+        self.save(update_fields=["meilleur_test", "date_modification"])
+
+
+class TestCuisson(models.Model):
+    """Essai de cuisson d'un plat.
+
+    Chaque essai est conservé : un nouveau test ne remplace jamais un ancien,
+    l'historique est le cœur de l'application.
+    """
+
+    class Note(models.IntegerChoices):
+        UNE = 1, "★☆☆☆☆"
+        DEUX = 2, "★★☆☆☆"
+        TROIS = 3, "★★★☆☆"
+        QUATRE = 4, "★★★★☆"
+        CINQ = 5, "★★★★★"
+
+    plat = models.ForeignKey(
+        Plat,
+        verbose_name="plat",
+        on_delete=models.CASCADE,
+        related_name="tests",
+    )
+    temperature_celsius = models.PositiveSmallIntegerField(
+        "température (°C)",
+        validators=[MinValueValidator(40), MaxValueValidator(260)],
+    )
+    duree_minutes = models.PositiveSmallIntegerField(
+        "durée (minutes)",
+        validators=[MinValueValidator(1), MaxValueValidator(600)],
+        help_text="Toujours en minutes, même au-delà d'une heure.",
+    )
+    note = models.PositiveSmallIntegerField("note", choices=Note.choices)
+    commentaire = models.TextField("commentaire", blank=True)
+    date_test = models.DateField("date du test", default=timezone.localdate)
+    date_creation = models.DateTimeField("date d'enregistrement", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "test de cuisson"
+        verbose_name_plural = "tests de cuisson"
+        ordering = ["-date_test", "-id"]
+        indexes = [models.Index(fields=["plat", "-date_test"])]
+
+    def __str__(self):
+        return f"{self.temperature_celsius} °C / {self.duree_minutes} min"
+
+    @property
+    def est_meilleur(self):
+        """Vrai si ce test est la meilleure combinaison retenue pour le plat."""
+        return self.plat.meilleur_test_id == self.pk
+
+    @property
+    def duree_lisible(self):
+        """Durée en heures et minutes, pour l'affichage seulement."""
+        heures, minutes = divmod(self.duree_minutes, 60)
+        if not heures:
+            return f"{minutes} min"
+        if not minutes:
+            return f"{heures} h"
+        return f"{heures} h {minutes:02d}"
+
+    def get_absolute_url(self):
+        return self.plat.get_absolute_url()

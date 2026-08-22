@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block titre %}{{ titre }} - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>{{ titre }}</h1>
+    <p><a href="{{ plat.get_absolute_url }}">Retour à {{ plat.nom }}</a></p>
+    <form method="post">
+        {% csrf_token %}
+        {% include "partials/formulaire.html" with formulaire=form %}
+        <button type="submit">Enregistrer le test</button>
+    </form>
+{% endblock %}

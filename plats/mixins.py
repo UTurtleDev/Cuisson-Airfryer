@@ -14,3 +14,9 @@ class ProprietaireRequisMixin(LoginRequiredMixin):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(**{self.champ_proprietaire: self.request.user})
+
+
+class PlatProprietaireRequisMixin(ProprietaireRequisMixin):
+    """Même principe, pour les objets rattachés à un plat (tests de cuisson)."""
+
+    champ_proprietaire = "plat__proprietaire"

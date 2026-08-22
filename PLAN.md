@@ -204,6 +204,8 @@ JavaScript maison : uniquement le menu mobile et l'aperçu d'image avant envoi. 
 
 ## 5. Découpage des lots (un lot = un commit vérifiable)
 
+État : lots 0 à 3 réalisés.
+
 **Lot 0 — Fondations** (spec phase 1)
 Dépendances, `environ` + `.env`, langue/fuseau, `templates/` et `static/` dans les settings, `base.html` + HTMX, `.gitignore` complet, premier commit.
 

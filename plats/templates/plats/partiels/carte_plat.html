@@ -5,6 +5,11 @@
     {% endif %}
     <h3><a href="{{ plat.get_absolute_url }}">{{ plat.nom }}</a></h3>
     <p class="auteur">Par {{ plat.proprietaire.nom_affiche }}</p>
+    {% if plat.meilleur_test %}
+        <p class="meilleure-combinaison">
+            {{ plat.meilleur_test.temperature_celsius }} °C / {{ plat.meilleur_test.duree_lisible }}
+        </p>
+    {% endif %}
     {% if plat.categories.all %}
         <ul class="categories">
             {% for categorie in plat.categories.all %}<li>{{ categorie.nom }}</li>{% endfor %}

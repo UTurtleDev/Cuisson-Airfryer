@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block titre %}Supprimer un test{% endblock %}
+
+{% block contenu %}
+    <h1>Supprimer ce test ?</h1>
+    <p>
+        {{ test.date_test|date:"d/m/Y" }} : {{ test.temperature_celsius }} °C /
+        {{ test.duree_lisible }}, note {{ test.get_note_display }}.
+    </p>
+    {% if test.est_meilleur %}
+        <p>Ce test est la meilleure combinaison actuelle du plat. Après suppression,
+        le plat n'en aura plus jusqu'à ce que vous en désigniez une autre.</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Supprimer</button>
+        <a href="{{ test.plat.get_absolute_url }}">Annuler</a>
+    </form>
+{% endblock %}

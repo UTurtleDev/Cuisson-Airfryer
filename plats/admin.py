@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from plats.models import Categorie, Plat
+from plats.models import Categorie, Plat, TestCuisson
 
 
 @admin.register(Categorie)
@@ -16,12 +16,22 @@ class CategorieAdmin(admin.ModelAdmin):
         return categorie.plats.count()
 
 
+class TestCuissonEnLigne(admin.TabularInline):
+    """Tests de cuisson consultables directement depuis la fiche du plat."""
+
+    model = TestCuisson
+    extra = 0
+    fields = ["date_test", "temperature_celsius", "duree_minutes", "note", "commentaire"]
+    ordering = ["-date_test"]
+
+
 @admin.register(Plat)
 class PlatAdmin(admin.ModelAdmin):
-    list_display = ["nom", "proprietaire", "date_creation", "est_une_copie"]
+    list_display = ["nom", "proprietaire", "meilleur_test", "date_creation", "est_une_copie"]
     list_filter = ["categories", "date_creation"]
     search_fields = ["nom", "description", "proprietaire__email"]
-    autocomplete_fields = ["proprietaire", "plat_origine"]
+    autocomplete_fields = ["proprietaire", "plat_origine", "meilleur_test"]
+    inlines = [TestCuissonEnLigne]
     filter_horizontal = ["categories"]
     readonly_fields = ["date_creation", "date_modification"]
     date_hierarchy = "date_creation"
@@ -30,6 +40,7 @@ class PlatAdmin(admin.ModelAdmin):
         (None, {"fields": ["proprietaire", "nom", "slug", "description", "image"]}),
         ("Classement", {"fields": ["categories"]}),
         ("Recette", {"fields": ["nombre_personnes", "temps_preparation_minutes"]}),
+        ("Cuisson", {"fields": ["meilleur_test"]}),
         ("Origine", {"fields": ["plat_origine"]}),
         ("Dates", {"fields": ["date_creation", "date_modification"]}),
     ]
@@ -40,3 +51,27 @@ class PlatAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("proprietaire")
+
+
+@admin.register(TestCuisson)
+class TestCuissonAdmin(admin.ModelAdmin):
+    list_display = [
+        "plat",
+        "date_test",
+        "temperature_celsius",
+        "duree_minutes",
+        "note",
+        "est_meilleur",
+    ]
+    list_filter = ["note", "date_test"]
+    search_fields = ["plat__nom", "commentaire", "plat__proprietaire__email"]
+    autocomplete_fields = ["plat"]
+    date_hierarchy = "date_test"
+    readonly_fields = ["date_creation"]
+
+    @admin.display(description="meilleure combinaison", boolean=True)
+    def est_meilleur(self, test):
+        return test.est_meilleur
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("plat", "plat__proprietaire")

@@ -1,0 +1,57 @@
+{#
+  Historique des essais de cuisson.
+  Fragment renvoyé tel quel par HTMX quand la meilleure combinaison change.
+#}
+<section id="historique" class="historique">
+    <h2>Historique des tests</h2>
+
+    {% if plat.meilleur_test %}
+        <p class="meilleure-combinaison">
+            Meilleure combinaison actuelle :
+            <strong>{{ plat.meilleur_test.temperature_celsius }} °C / {{ plat.meilleur_test.duree_lisible }}</strong>
+        </p>
+    {% else %}
+        <p class="meilleure-combinaison">Aucune meilleure combinaison désignée pour l'instant.</p>
+    {% endif %}
+
+    {% if tests %}
+        <table class="tableau-tests">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Température</th>
+                    <th>Durée</th>
+                    <th>Note</th>
+                    <th>Commentaire</th>
+                    {% if est_proprietaire %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for test in tests %}
+                    <tr class="{% if test.est_meilleur %}test--meilleur{% endif %}">
+                        <td>{{ test.date_test|date:"d/m/Y" }}</td>
+                        <td>{{ test.temperature_celsius }} °C</td>
+                        <td>{{ test.duree_lisible }}</td>
+                        <td>{{ test.get_note_display }}</td>
+                        <td>{{ test.commentaire|default:"-" }}</td>
+                        {% if est_proprietaire %}
+                            <td class="actions">
+                                <button
+                                    type="button"
+                                    hx-post="{% url 'plats:definir_meilleur_test' test.pk %}"
+                                    hx-target="#historique"
+                                    hx-swap="outerHTML">
+                                    {% if test.est_meilleur %}Retirer{% else %}Meilleure{% endif %}
+                                </button>
+                                <a href="{% url 'plats:modifier_test' test.pk %}">Modifier</a>
+                                <a href="{% url 'plats:supprimer_test' test.pk %}">Supprimer</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucun test enregistré pour ce plat.</p>
+    {% endif %}
+</section>
