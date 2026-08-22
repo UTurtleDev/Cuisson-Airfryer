@@ -61,3 +61,62 @@ class TableauDeBordTest(TestCase):
         self.assertContains(reponse, "Hamburger")
         self.assertNotContains(reponse, "Onion rings")
         self.assertContains(reponse, "190 °C")
+
+
+class GabaritsTest(TestCase):
+    """Garde-fous sur l'écriture des gabarits."""
+
+    def chemins_des_gabarits(self):
+        from pathlib import Path
+
+        from django.conf import settings
+
+        racine = Path(settings.BASE_DIR)
+        for chemin in racine.rglob("*.html"):
+            if ".venv" in chemin.parts or "staticfiles" in chemin.parts:
+                continue
+            yield chemin
+
+    def test_aucun_commentaire_multiligne(self):
+        """{# ... #} ne tient que sur une ligne : au-delà, Django l'affiche.
+
+        Les commentaires de plusieurs lignes doivent utiliser
+        {% comment %} ... {% endcomment %}.
+        """
+        fautifs = []
+        for chemin in self.chemins_des_gabarits():
+            for numero, ligne in enumerate(chemin.read_text().splitlines(), 1):
+                if "{#" in ligne and "#}" not in ligne:
+                    fautifs.append(f"{chemin.name}:{numero}")
+        self.assertEqual(fautifs, [], f"Commentaires multilignes à corriger : {fautifs}")
+
+
+class PagesRendueTest(TestCase):
+    """Vérifie qu'aucune syntaxe de gabarit ne fuit dans les pages rendues."""
+
+    def setUp(self):
+        self.membre = creer_membre()
+        self.plat = creer_plat(self.membre, nom="Gnocchi au chorizo")
+        creer_test(self.plat)
+        self.client.force_login(self.membre)
+
+    def pages(self):
+        from django.urls import reverse
+
+        return [
+            reverse("principal:accueil"),
+            reverse("principal:tableau_de_bord"),
+            reverse("plats:liste"),
+            reverse("plats:mes_plats"),
+            self.plat.get_absolute_url(),
+            reverse("plats:creer"),
+            reverse("plats:creer_test", args=[self.plat.slug]),
+        ]
+
+    def test_aucune_balise_de_gabarit_affichee(self):
+        for url in self.pages():
+            with self.subTest(url=url):
+                contenu = self.client.get(url).content.decode()
+                self.assertNotIn("{#", contenu)
+                self.assertNotIn("{%", contenu)
+                self.assertNotIn("{{", contenu)
