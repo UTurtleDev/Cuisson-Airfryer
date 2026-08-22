@@ -134,3 +134,43 @@ class PaginationTest(TestCase):
         # Plat 1, 10, 11, 12, 13, 14 : six résultats, une seule page.
         self.assertEqual(len(reponse.context["plats"]), 6)
         self.assertFalse(reponse.context["is_paginated"])
+
+
+class CompteurResultatsTest(TestCase):
+    def setUp(self):
+        self.membre = creer_membre()
+        for numero in range(6):
+            creer_plat(self.membre, nom=f"Plat {numero}")
+        self.client.force_login(self.membre)
+
+    def test_compteur_sans_filtre(self):
+        reponse = self.client.get(reverse("plats:liste"))
+        self.assertContains(reponse, "6 plats")
+
+    def test_compteur_apres_filtre(self):
+        reponse = self.client.get(reverse("plats:liste"), {"q": "Plat 3"})
+        self.assertContains(reponse, "1 plat")
+        self.assertNotContains(reponse, "1 plats")
+
+    def test_compteur_sans_resultat(self):
+        reponse = self.client.get(reverse("plats:liste"), {"q": "inexistant"})
+        self.assertContains(reponse, "0 plat")
+        self.assertNotContains(reponse, "0 plats")
+
+    def test_compteur_total_et_non_taille_de_page(self):
+        """Avec 15 plats et 12 par page, le compteur annonce bien 15."""
+        for numero in range(9):
+            creer_plat(self.membre, nom=f"Autre {numero}")
+        reponse = self.client.get(reverse("plats:liste"))
+        self.assertContains(reponse, "15 plats")
+        self.assertEqual(len(reponse.context["plats"]), 12)
+
+    def test_compteur_en_htmx(self):
+        reponse = self.client.get(
+            reverse("plats:liste"), {"q": "Plat"}, headers={"HX-Request": "true"}
+        )
+        self.assertContains(reponse, "6 plats")
+
+    def test_compteur_sur_mes_plats(self):
+        reponse = self.client.get(reverse("plats:mes_plats"))
+        self.assertContains(reponse, "6 plats")

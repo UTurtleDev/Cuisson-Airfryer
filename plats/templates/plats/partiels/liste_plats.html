@@ -1,8 +1,10 @@
 {# Fragment renvoyé par HTMX lors de la recherche et des filtres. #}
 <div id="resultats" class="resultats">
-    <p class="nombre-resultats">
-        {{ page_obj.paginator.count|default:plats|length }} plat{{ page_obj.paginator.count|pluralize }}
-    </p>
+    {% with nombre=page_obj.paginator.count %}
+        <p class="nombre-resultats">
+            {{ nombre }} plat{% if nombre > 1 %}s{% endif %}
+        </p>
+    {% endwith %}
 
     <div class="grille-plats">
         {% for plat in plats %}
