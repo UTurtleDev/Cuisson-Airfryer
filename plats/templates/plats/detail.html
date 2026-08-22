@@ -57,6 +57,8 @@
             <p><a href="{% url 'plats:creer_test' plat.slug %}">Ajouter un test de cuisson</a></p>
         {% endif %}
 
+        {% include "plats/partiels/recette.html" %}
+
         {% include "plats/partiels/historique.html" %}
 
         {% comment %}

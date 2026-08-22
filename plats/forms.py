@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from plats.models import Categorie, Plat, TestCuisson
+from plats.models import Categorie, EtapePreparation, Ingredient, Plat, TestCuisson
 
 Utilisateur = get_user_model()
 
@@ -142,3 +142,54 @@ class FormulaireFiltrePlats(forms.Form):
             queryset = queryset.filter(favoris__utilisateur=utilisateur)
 
         return queryset
+
+
+class FormulaireIngredient(forms.ModelForm):
+    class Meta:
+        model = Ingredient
+        fields = ["nom", "quantite", "unite"]
+        widgets = {
+            "nom": forms.TextInput(attrs={"placeholder": "Farine"}),
+            "quantite": forms.NumberInput(attrs={"placeholder": "250", "step": "0.01"}),
+        }
+
+
+class FormulaireEtape(forms.ModelForm):
+    class Meta:
+        model = EtapePreparation
+        fields = ["texte"]
+        widgets = {
+            "texte": forms.Textarea(
+                attrs={"rows": 2, "placeholder": "Préchauffer l'Airfryer à 180 °C."}
+            ),
+        }
+
+
+#: Formsets de la recette. L'ordre d'affichage vient de la position du
+#: formulaire dans la page, l'utilisateur n'a pas de numéro à saisir.
+JeuIngredients = forms.models.inlineformset_factory(
+    Plat,
+    Ingredient,
+    form=FormulaireIngredient,
+    extra=3,
+    can_delete=True,
+)
+
+JeuEtapes = forms.models.inlineformset_factory(
+    Plat,
+    EtapePreparation,
+    form=FormulaireEtape,
+    extra=3,
+    can_delete=True,
+)
+
+
+class FormulaireAdaptationRecette(forms.Form):
+    """Choix du nombre de personnes pour l'affichage d'une recette."""
+
+    personnes = forms.IntegerField(
+        label="Pour combien de personnes",
+        min_value=1,
+        max_value=50,
+        required=False,
+    )

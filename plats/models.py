@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -6,6 +8,14 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from plats.managers import PlatQuerySet
+
+
+def format_nombre(quantite):
+    """Affiche une quantité sans décimales inutiles : 250, 2.5, 0.75."""
+    quantite = quantite.normalize()
+    if quantite == quantite.to_integral_value():
+        quantite = quantite.quantize(Decimal(1))
+    return f"{quantite:f}".replace(".", ",")
 
 
 class Categorie(models.Model):
@@ -125,6 +135,10 @@ class Plat(models.Model):
 
     def appartient_a(self, utilisateur):
         return utilisateur.is_authenticated and self.proprietaire_id == utilisateur.pk
+
+    @property
+    def a_une_recette(self):
+        return self.ingredients.exists() or self.etapes.exists()
 
     def tests_numerotes(self):
         """Tests du plus récent au plus ancien, numérotés dans l'ordre des essais.
@@ -253,3 +267,85 @@ class Favori(models.Model):
 
     def __str__(self):
         return f"{self.utilisateur} ♥ {self.plat}"
+
+
+class Ingredient(models.Model):
+    """Ingrédient d'un plat, avec sa quantité pour le nombre de personnes du plat."""
+
+    class Unite(models.TextChoices):
+        GRAMME = "g", "g"
+        KILOGRAMME = "kg", "kg"
+        MILLILITRE = "ml", "ml"
+        CENTILITRE = "cl", "cl"
+        LITRE = "l", "l"
+        CUILLERE_CAFE = "cc", "cuillère à café"
+        CUILLERE_SOUPE = "cs", "cuillère à soupe"
+        PINCEE = "pincee", "pincée"
+        TRANCHE = "tranche", "tranche"
+
+    plat = models.ForeignKey(
+        Plat,
+        verbose_name="plat",
+        on_delete=models.CASCADE,
+        related_name="ingredients",
+    )
+    nom = models.CharField("ingrédient", max_length=120)
+    quantite = models.DecimalField(
+        "quantité",
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        help_text="Laisser vide pour une quantité libre (« sel », « poivre »).",
+    )
+    unite = models.CharField(
+        "unité",
+        max_length=10,
+        choices=Unite.choices,
+        blank=True,
+        help_text="Vide pour compter en pièces (« 2 œufs »).",
+    )
+    ordre = models.PositiveSmallIntegerField("ordre", default=0)
+
+    class Meta:
+        verbose_name = "ingrédient"
+        verbose_name_plural = "ingrédients"
+        ordering = ["ordre", "id"]
+
+    def __str__(self):
+        return self.libelle
+
+    @property
+    def libelle(self):
+        """Texte affichable : « 250 g de farine », « 2 œufs », « sel »."""
+        return self.libelle_pour(self.quantite)
+
+    def libelle_pour(self, quantite):
+        if quantite is None:
+            return self.nom
+        nombre = format_nombre(quantite)
+        if self.unite:
+            return f"{nombre} {self.get_unite_display()} de {self.nom}"
+        return f"{nombre} {self.nom}"
+
+
+class EtapePreparation(models.Model):
+    """Étape de préparation d'un plat."""
+
+    plat = models.ForeignKey(
+        Plat,
+        verbose_name="plat",
+        on_delete=models.CASCADE,
+        related_name="etapes",
+    )
+    ordre = models.PositiveSmallIntegerField("ordre", default=0)
+    texte = models.TextField("étape")
+
+    class Meta:
+        verbose_name = "étape de préparation"
+        verbose_name_plural = "étapes de préparation"
+        ordering = ["ordre", "id"]
+
+    def __str__(self):
+        return f"Étape {self.ordre}"

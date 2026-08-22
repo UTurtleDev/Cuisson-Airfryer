@@ -186,6 +186,11 @@ MAILERS = {
 DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="cuisson@localhost")
 
 
+# Tests
+
+TEST_RUNNER = "config.runner.CoureurDeTests"
+
+
 # Authentification
 
 AUTH_USER_MODEL = "users.Utilisateur"

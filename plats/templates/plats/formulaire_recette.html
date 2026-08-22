@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block titre %}Recette - {{ plat.nom }}{% endblock %}
+
+{% block contenu %}
+    <h1>Recette de {{ plat.nom }}</h1>
+    <p>
+        Quantités données pour {{ plat.nombre_personnes }} personnes.
+        <a href="{% url 'plats:modifier' plat.slug %}">Changer ce nombre</a>.
+    </p>
+    <p><a href="{{ plat.get_absolute_url }}">Retour au plat</a></p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <fieldset>
+            <legend>Ingrédients</legend>
+            {{ jeux.ingredients.management_form }}
+            {% for formulaire in jeux.ingredients %}
+                <div class="ligne-recette">
+                    {{ formulaire.id }}
+                    {% include "partials/formulaire.html" with formulaire=formulaire %}
+                </div>
+            {% endfor %}
+        </fieldset>
+
+        <fieldset>
+            <legend>Étapes de préparation</legend>
+            {{ jeux.etapes.management_form }}
+            {% for formulaire in jeux.etapes %}
+                <div class="ligne-recette">
+                    {{ formulaire.id }}
+                    {% include "partials/formulaire.html" with formulaire=formulaire %}
+                </div>
+            {% endfor %}
+        </fieldset>
+
+        <p class="explication">
+            Les lignes vides sont ignorées. L'ordre d'affichage suit l'ordre des
+            lignes ci-dessus.
+        </p>
+        <button type="submit">Enregistrer la recette</button>
+    </form>
+{% endblock %}

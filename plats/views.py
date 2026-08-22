@@ -13,10 +13,22 @@ from django.views.generic import (
 )
 from django.views.generic.detail import SingleObjectMixin
 
-from plats.forms import FormulaireFiltrePlats, FormulairePlat, FormulaireTestCuisson
+from plats.forms import (
+    FormulaireAdaptationRecette,
+    FormulaireFiltrePlats,
+    FormulairePlat,
+    FormulaireTestCuisson,
+    JeuEtapes,
+    JeuIngredients,
+)
 from plats.mixins import PlatProprietaireRequisMixin, ProprietaireRequisMixin
 from plats.models import Plat, TestCuisson
-from plats.services import CopieImpossible, basculer_favori, copier_plat
+from plats.services import (
+    CopieImpossible,
+    adapter_quantites,
+    basculer_favori,
+    copier_plat,
+)
 
 
 class ListePlatsView(LoginRequiredMixin, ListView):
@@ -82,6 +94,15 @@ class DetailPlatView(LoginRequiredMixin, DetailView):
         contexte = super().get_context_data(**kwargs)
         contexte["tests"] = self.object.tests_numerotes()
         contexte["est_proprietaire"] = self.object.appartient_a(self.request.user)
+
+        # Recette affichée telle qu'elle est écrite ; l'adaptation à un autre
+        # nombre de convives passe par RecetteView.
+        contexte["ingredients"] = adapter_quantites(
+            self.object, self.object.nombre_personnes
+        )
+        contexte["etapes"] = self.object.etapes.all()
+        contexte["personnes"] = self.object.nombre_personnes
+        contexte["quantites_adaptees"] = False
         return contexte
 
 
@@ -227,6 +248,21 @@ class DefinirMeilleurTestView(PlatProprietaireRequisMixin, SingleObjectMixin, Vi
         return redirect(plat.get_absolute_url())
 
 
+def enregistrer_dans_l_ordre(jeu):
+    """Enregistre un formset en numérotant les lignes selon leur position.
+
+    L'ordre affiché est celui de la page : l'utilisateur n'a aucun numéro à
+    saisir, il lui suffit de remplir les lignes dans l'ordre voulu.
+    """
+    position = 0
+    for formulaire in jeu.forms:
+        if not formulaire.cleaned_data or formulaire.cleaned_data.get("DELETE"):
+            continue
+        position += 1
+        formulaire.instance.ordre = position
+    jeu.save()
+
+
 class ComparerTestsView(LoginRequiredMixin, TemplateView):
     """Comparaison de plusieurs essais d'un même plat.
 
@@ -339,3 +375,62 @@ class CopierPlatView(LoginRequiredMixin, SingleObjectMixin, View):
             "Copie créée. Elle vous appartient, faites-en ce que vous voulez.",
         )
         return redirect(copie.get_absolute_url())
+
+
+class ModifierRecetteView(PlatDuMembreMixin, TemplateView):
+    """Édition des ingrédients et des étapes, sur une page dédiée.
+
+    Deux formsets plutôt qu'un formulaire géant : la fiche du plat reste
+    simple, et la recette peut s'étoffer sans l'alourdir.
+    """
+
+    template_name = "plats/formulaire_recette.html"
+
+    def jeux(self, donnees=None):
+        plat = self.get_plat()
+        return {
+            "ingredients": JeuIngredients(donnees, instance=plat, prefix="ingredients"),
+            "etapes": JeuEtapes(donnees, instance=plat, prefix="etapes"),
+        }
+
+    def get_context_data(self, **kwargs):
+        contexte = super().get_context_data(**kwargs)
+        contexte["plat"] = self.get_plat()
+        contexte.setdefault("jeux", self.jeux())
+        return contexte
+
+    def post(self, requete, *args, **kwargs):
+        jeux = self.jeux(requete.POST)
+        if all(jeu.is_valid() for jeu in jeux.values()):
+            for jeu in jeux.values():
+                enregistrer_dans_l_ordre(jeu)
+            messages.success(requete, "Recette enregistrée.")
+            return redirect(self.get_plat().get_absolute_url())
+
+        return self.render_to_response(self.get_context_data(jeux=jeux))
+
+
+class RecetteView(LoginRequiredMixin, TemplateView):
+    """Affiche la recette d'un plat, adaptée à un nombre de personnes.
+
+    Vue séparée pour servir le fragment HTMX lors du changement de convives.
+    """
+
+    template_name = "plats/partiels/recette.html"
+
+    def get_context_data(self, **kwargs):
+        contexte = super().get_context_data(**kwargs)
+        plat = get_object_or_404(Plat.objects.visibles(), slug=self.kwargs["slug"])
+
+        formulaire = FormulaireAdaptationRecette(self.request.GET or None)
+        personnes = plat.nombre_personnes
+        if formulaire.is_bound and formulaire.is_valid():
+            personnes = formulaire.cleaned_data.get("personnes") or plat.nombre_personnes
+
+        contexte["plat"] = plat
+        contexte["ingredients"] = adapter_quantites(plat, personnes)
+        contexte["etapes"] = plat.etapes.all()
+        contexte["personnes"] = personnes
+        contexte["quantites_adaptees"] = personnes != plat.nombre_personnes
+        contexte["est_proprietaire"] = plat.appartient_a(self.request.user)
+        return contexte

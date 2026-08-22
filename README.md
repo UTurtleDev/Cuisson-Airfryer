@@ -39,12 +39,23 @@ uv run python manage.py runserver
 uv run python manage.py test
 ```
 
+Le lanceur `config.runner.CoureurDeTests` bascule sur un hachage de mot de
+passe rapide pendant les tests, ce qui ramène la suite de deux minutes à
+environ une seconde. La production garde le hachage sécurisé de Django.
+
+Jeu de données de démonstration pour le développement local :
+
+```bash
+uv run python manage.py donnees_demo
+```
+
 ## Structure
 
 | Dossier | Rôle |
 |---|---|
 | `config/` | Réglages, urls racine, WSGI |
 | `users/` | Modèle Utilisateur, authentification par email, profil |
+| `plats/` | Plats, catégories, tests de cuisson, favoris, recettes |
 | `principal/` | Accueil, tableau de bord, gabarit de base |
 | `templates/` | Gabarits partagés et fragments HTMX |
 | `static/` | CSS, JavaScript, HTMX vendorisé |

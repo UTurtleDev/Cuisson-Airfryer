@@ -230,3 +230,37 @@ a {
 .formulaire-copie {
     display: inline;
 }
+
+.recette {
+    margin: 1.5rem 0;
+}
+
+.adaptation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.adaptation input[type="number"] {
+    width: 5rem;
+}
+
+.liste-ingredients,
+.liste-etapes {
+    padding-left: 1.25rem;
+}
+
+.ligne-recette {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--bordure);
+    padding: 0.5rem 0;
+}
+
+.ligne-recette .champ {
+    margin: 0;
+}

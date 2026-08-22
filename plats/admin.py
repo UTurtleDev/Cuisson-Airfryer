@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from plats.models import Categorie, Favori, Plat, TestCuisson
+from plats.models import (
+    Categorie,
+    EtapePreparation,
+    Favori,
+    Ingredient,
+    Plat,
+    TestCuisson,
+)
 
 
 @admin.register(Categorie)
@@ -14,6 +21,20 @@ class CategorieAdmin(admin.ModelAdmin):
     @admin.display(description="plats")
     def nombre_de_plats(self, categorie):
         return categorie.plats.count()
+
+
+class IngredientEnLigne(admin.TabularInline):
+    model = Ingredient
+    extra = 0
+    fields = ["ordre", "nom", "quantite", "unite"]
+    ordering = ["ordre", "id"]
+
+
+class EtapeEnLigne(admin.TabularInline):
+    model = EtapePreparation
+    extra = 0
+    fields = ["ordre", "texte"]
+    ordering = ["ordre", "id"]
 
 
 class TestCuissonEnLigne(admin.TabularInline):
@@ -31,7 +52,7 @@ class PlatAdmin(admin.ModelAdmin):
     list_filter = ["categories", "date_creation"]
     search_fields = ["nom", "description", "proprietaire__email"]
     autocomplete_fields = ["proprietaire", "plat_origine", "meilleur_test"]
-    inlines = [TestCuissonEnLigne]
+    inlines = [IngredientEnLigne, EtapeEnLigne, TestCuissonEnLigne]
     filter_horizontal = ["categories"]
     readonly_fields = ["date_creation", "date_modification"]
     date_hierarchy = "date_creation"

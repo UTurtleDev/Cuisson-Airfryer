@@ -14,6 +14,12 @@ urlpatterns = [
     path("<slug:slug>/supprimer/", views.SupprimerPlatView.as_view(), name="supprimer"),
     path("<slug:slug>/favori/", views.BasculerFavoriView.as_view(), name="basculer_favori"),
     path("<slug:slug>/copier/", views.CopierPlatView.as_view(), name="copier"),
+    path("<slug:slug>/recette/", views.RecetteView.as_view(), name="recette"),
+    path(
+        "<slug:slug>/recette/modifier/",
+        views.ModifierRecetteView.as_view(),
+        name="modifier_recette",
+    ),
     path("<slug:slug>/comparer/", views.ComparerTestsView.as_view(), name="comparer"),
     path("<slug:slug>/tests/ajouter/", views.CreerTestView.as_view(), name="creer_test"),
     path("tests/<int:pk>/modifier/", views.ModifierTestView.as_view(), name="modifier_test"),

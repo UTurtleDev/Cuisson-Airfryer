@@ -1,0 +1,61 @@
+{% comment %}
+    Recette du plat, adaptée au nombre de personnes demandé.
+    Fragment renvoyé tel quel par HTMX quand on change le nombre de convives.
+{% endcomment %}
+<section id="recette" class="recette">
+    <h2>Recette</h2>
+
+    {% if plat.a_une_recette %}
+        <form
+            class="adaptation"
+            method="get"
+            action="{% url 'plats:recette' plat.slug %}"
+            hx-get="{% url 'plats:recette' plat.slug %}"
+            hx-target="#recette"
+            hx-swap="outerHTML"
+            hx-trigger="change, submit">
+            <label for="personnes-{{ plat.pk }}">Pour</label>
+            <input type="number" name="personnes" id="personnes-{{ plat.pk }}"
+                   value="{{ personnes }}" min="1" max="50">
+            <label for="personnes-{{ plat.pk }}">personnes</label>
+            <button type="submit">Adapter</button>
+            {% if quantites_adaptees %}
+                <span class="rappel">
+                    Recette écrite pour {{ plat.nombre_personnes }} personnes,
+                    quantités recalculées.
+                </span>
+            {% endif %}
+        </form>
+
+        {% if ingredients %}
+            <h3>Ingrédients</h3>
+            <ul class="liste-ingredients">
+                {% for ingredient in ingredients %}
+                    <li>{{ ingredient.libelle_adapte }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if etapes %}
+            <h3>Préparation</h3>
+            <ol class="liste-etapes">
+                {% for etape in etapes %}
+                    <li>{{ etape.texte|linebreaksbr }}</li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    {% else %}
+        <p>
+            Aucune recette pour ce plat.
+            {% if est_proprietaire %}
+                <a href="{% url 'plats:modifier_recette' plat.slug %}">En écrire une</a>.
+            {% endif %}
+        </p>
+    {% endif %}
+
+    {% if est_proprietaire and plat.a_une_recette %}
+        <p class="actions">
+            <a href="{% url 'plats:modifier_recette' plat.slug %}">Modifier la recette</a>
+        </p>
+    {% endif %}
+</section>

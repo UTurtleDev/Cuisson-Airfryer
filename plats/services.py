@@ -18,8 +18,8 @@ class CopieImpossible(Exception):
 def copier_plat(plat, utilisateur):
     """Crée une copie indépendante d'un plat au nom d'un autre membre.
 
-    Ce qui est copié : le nom, la description, l'image, les catégories et les
-    informations de recette.
+    Ce qui est copié : le nom, la description, l'image, les catégories, les
+    ingrédients et les étapes de préparation.
 
     Ce qui ne l'est pas : les tests de cuisson. Ils appartiennent à
     l'expérience de leur auteur, et un Airfryer ne cuit pas de la même façon
@@ -41,11 +41,36 @@ def copier_plat(plat, utilisateur):
         plat_origine=plat,
     )
     copie.categories.set(plat.categories.all())
+    copier_recette(plat, copie)
 
     if plat.image:
         copier_image(plat, copie)
 
     return copie
+
+
+def copier_recette(plat, copie):
+    """Duplique ingrédients et étapes, en conservant leur ordre."""
+    from plats.models import EtapePreparation, Ingredient
+
+    Ingredient.objects.bulk_create(
+        [
+            Ingredient(
+                plat=copie,
+                nom=ingredient.nom,
+                quantite=ingredient.quantite,
+                unite=ingredient.unite,
+                ordre=ingredient.ordre,
+            )
+            for ingredient in plat.ingredients.all()
+        ]
+    )
+    EtapePreparation.objects.bulk_create(
+        [
+            EtapePreparation(plat=copie, ordre=etape.ordre, texte=etape.texte)
+            for etape in plat.etapes.all()
+        ]
+    )
 
 
 def copier_image(plat, copie):
@@ -74,3 +99,35 @@ def basculer_favori(plat, utilisateur):
 
     Favori.objects.create(utilisateur=utilisateur, plat=plat)
     return True
+
+
+def adapter_quantites(plat, nombre_personnes_cible):
+    """Adapte les quantités d'un plat à un autre nombre de personnes.
+
+    Les ingrédients reçoivent un attribut ``quantite_adaptee`` et un attribut
+    ``libelle_adapte``. Le plat et ses ingrédients ne sont jamais modifiés en
+    base : l'adaptation est un calcul d'affichage.
+
+    Une quantité vide reste vide : « sel » ou « poivre » ne se multiplient pas.
+    """
+    from decimal import ROUND_HALF_UP, Decimal
+
+    ingredients = list(plat.ingredients.all())
+
+    reference = plat.nombre_personnes or 0
+    if not reference or not nombre_personnes_cible or nombre_personnes_cible == reference:
+        for ingredient in ingredients:
+            ingredient.quantite_adaptee = ingredient.quantite
+            ingredient.libelle_adapte = ingredient.libelle
+        return ingredients
+
+    facteur = Decimal(nombre_personnes_cible) / Decimal(reference)
+    for ingredient in ingredients:
+        if ingredient.quantite is None:
+            ingredient.quantite_adaptee = None
+        else:
+            ingredient.quantite_adaptee = (ingredient.quantite * facteur).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+        ingredient.libelle_adapte = ingredient.libelle_pour(ingredient.quantite_adaptee)
+    return ingredients
