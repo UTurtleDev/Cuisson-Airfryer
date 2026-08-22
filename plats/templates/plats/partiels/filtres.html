@@ -1,0 +1,52 @@
+{#
+  Recherche et filtres.
+  Sans HTMX, le formulaire reste un simple GET qui recharge la page : le
+  comportement dégradé fonctionne toujours.
+#}
+<form
+    class="filtres"
+    method="get"
+    action="{% url 'plats:liste' %}"
+    hx-get="{% url 'plats:liste' %}"
+    hx-target="#resultats"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    hx-indicator="#indicateur-recherche"
+    hx-trigger="input changed delay:300ms from:input[type=text], input changed delay:500ms from:input[type=number], change, submit">
+
+    <p class="champ champ--recherche">
+        {{ formulaire_filtres.q.label_tag }}
+        {{ formulaire_filtres.q }}
+        <span id="indicateur-recherche" class="htmx-indicator">Recherche…</span>
+    </p>
+
+    <fieldset class="champ champ--categories">
+        <legend>{{ formulaire_filtres.categories.label }}</legend>
+        {{ formulaire_filtres.categories }}
+    </fieldset>
+
+    <p class="champ">
+        {{ formulaire_filtres.duree_maximum.label_tag }}
+        {{ formulaire_filtres.duree_maximum }}
+    </p>
+
+    <p class="champ">
+        {{ formulaire_filtres.preparation_maximum.label_tag }}
+        {{ formulaire_filtres.preparation_maximum }}
+    </p>
+
+    <p class="champ">
+        {{ formulaire_filtres.mes_plats_uniquement }}
+        {{ formulaire_filtres.mes_plats_uniquement.label_tag }}
+    </p>
+
+    <p class="champ">
+        {{ formulaire_filtres.avec_meilleure_combinaison }}
+        {{ formulaire_filtres.avec_meilleure_combinaison.label_tag }}
+    </p>
+
+    <p class="actions">
+        <button type="submit">Filtrer</button>
+        <a href="{% url 'plats:liste' %}">Réinitialiser</a>
+    </p>
+</form>

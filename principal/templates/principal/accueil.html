@@ -8,10 +8,51 @@
         Notez vos essais de cuisson, gardez l'historique complet et retrouvez
         la meilleure combinaison de température et de durée pour chaque plat.
     </p>
+
     {% if user.is_authenticated %}
-        <p><a href="{% url 'plats:liste' %}">Voir les plats de la famille</a></p>
+        {% if plats_avec_meilleure_combinaison %}
+            <section class="mise-en-avant">
+                <h2>Cuissons au point</h2>
+                <p class="explication">Les plats dont la meilleure combinaison est trouvée.</p>
+                <div class="grille-plats">
+                    {% for plat in plats_avec_meilleure_combinaison %}
+                        {% include "plats/partiels/carte_plat.html" %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if plats_mieux_notes %}
+            <section class="mise-en-avant">
+                <h2>Les mieux notés</h2>
+                <div class="grille-plats">
+                    {% for plat in plats_mieux_notes %}
+                        {% include "plats/partiels/carte_plat.html" %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if plats_recents %}
+            <section class="mise-en-avant">
+                <h2>Derniers ajouts</h2>
+                <div class="grille-plats">
+                    {% for plat in plats_recents %}
+                        {% include "plats/partiels/carte_plat.html" %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% else %}
+            <p>
+                Aucun plat pour le moment.
+                <a href="{% url 'plats:creer' %}">Ajoutez le premier</a>.
+            </p>
+        {% endif %}
     {% else %}
-        <p><a href="{% url 'users:inscription' %}">Créer un compte</a></p>
+        <p>
+            <a href="{% url 'users:connexion' %}">Se connecter</a>
+            ou <a href="{% url 'users:inscription' %}">créer un compte</a>
+            pour voir les plats de la famille.
+        </p>
     {% endif %}
-    {# Mise en avant des meilleurs plats : lot 4. #}
 {% endblock %}

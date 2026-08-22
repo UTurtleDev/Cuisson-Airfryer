@@ -12,21 +12,46 @@ from django.views.generic import (
 )
 from django.views.generic.detail import SingleObjectMixin
 
-from plats.forms import FormulairePlat, FormulaireTestCuisson
+from plats.forms import FormulaireFiltrePlats, FormulairePlat, FormulaireTestCuisson
 from plats.mixins import PlatProprietaireRequisMixin, ProprietaireRequisMixin
 from plats.models import Plat, TestCuisson
 
 
 class ListePlatsView(LoginRequiredMixin, ListView):
-    """Liste des plats de tous les membres."""
+    """Liste des plats de tous les membres, avec recherche et filtres.
+
+    La même vue sert la page complète et, en HTMX, le seul fragment des
+    résultats : inutile de reconstruire l'en-tête et le formulaire à chaque
+    frappe.
+    """
 
     model = Plat
     context_object_name = "plats"
     paginate_by = 12
     template_name = "plats/liste.html"
+    template_name_fragment = "plats/partiels/liste_plats.html"
+
+    def get_formulaire(self):
+        if not hasattr(self, "_formulaire"):
+            self._formulaire = FormulaireFiltrePlats(self.request.GET or None)
+        return self._formulaire
 
     def get_queryset(self):
-        return Plat.objects.visibles().avec_details()
+        queryset = Plat.objects.visibles().avec_details()
+        formulaire = self.get_formulaire()
+        if formulaire.is_bound and formulaire.is_valid():
+            queryset = formulaire.filtrer(queryset, self.request.user)
+        return queryset
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request"):
+            return [self.template_name_fragment]
+        return [self.template_name]
+
+    def get_context_data(self, **kwargs):
+        contexte = super().get_context_data(**kwargs)
+        contexte["formulaire_filtres"] = self.get_formulaire()
+        return contexte
 
 
 class MesPlatsView(LoginRequiredMixin, ListView):

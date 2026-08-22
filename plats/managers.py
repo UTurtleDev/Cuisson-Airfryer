@@ -26,6 +26,30 @@ class PlatQuerySet(models.QuerySet):
             return self
         return self.filter(models.Q(nom__icontains=terme) | models.Q(description__icontains=terme))
 
+    def preparation_maximum(self, minutes):
+        """Filtre sur le temps de préparation renseigné du plat."""
+        if not minutes:
+            return self
+        return self.filter(temps_preparation_minutes__lte=minutes)
+
+    def avec_note_moyenne(self):
+        """Annote la note moyenne et le nombre de tests de chaque plat."""
+        return self.annotate(
+            note_moyenne=models.Avg("tests__note"),
+            nombre_tests=models.Count("tests", distinct=True),
+        )
+
+    def mieux_notes(self):
+        """Plats ayant au moins un test, du mieux noté au moins bien noté."""
+        return (
+            self.avec_note_moyenne()
+            .filter(note_moyenne__isnull=False)
+            .order_by("-note_moyenne", "-date_creation")
+        )
+
+    def recents(self):
+        return self.order_by("-date_creation")
+
     def avec_meilleur_test(self):
         """Ne garde que les plats dont la meilleure combinaison est désignée."""
         return self.filter(meilleur_test__isnull=False)

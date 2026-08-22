@@ -5,6 +5,7 @@
 {% block contenu %}
     <h1>Les plats</h1>
     <p><a href="{% url 'plats:creer' %}">Ajouter un plat</a></p>
-    {# La recherche et les filtres HTMX viendront se brancher ici (lot 4). #}
+
+    {% include "plats/partiels/filtres.html" %}
     {% include "plats/partiels/liste_plats.html" %}
 {% endblock %}

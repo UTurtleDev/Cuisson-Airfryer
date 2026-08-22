@@ -5,10 +5,37 @@
 {% block contenu %}
     <h1>Tableau de bord</h1>
     <p>Bonjour {{ user.prenom|default:user.email }}.</p>
+
     <ul class="raccourcis">
         <li><a href="{% url 'plats:creer' %}">Ajouter un plat</a></li>
-        <li><a href="{% url 'plats:mes_plats' %}">Mes plats</a></li>
+        <li><a href="{% url 'plats:mes_plats' %}">Mes plats ({{ nombre_de_plats }})</a></li>
         <li><a href="{% url 'plats:liste' %}">Tous les plats de la famille</a></li>
     </ul>
-    {# Derniers tests de cuisson et favoris : lots 3 et 6. #}
+
+    {% if derniers_tests %}
+        <section>
+            <h2>Mes derniers tests</h2>
+            <ul class="derniers-tests">
+                {% for test in derniers_tests %}
+                    <li>
+                        <a href="{{ test.plat.get_absolute_url }}">{{ test.plat.nom }}</a> :
+                        {{ test.temperature_celsius }} °C / {{ test.duree_lisible }},
+                        {{ test.get_note_display }}
+                        <span class="date">{{ test.date_test|date:"d/m/Y" }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    {% if mes_plats %}
+        <section>
+            <h2>Mes plats récents</h2>
+            <div class="grille-plats">
+                {% for plat in mes_plats %}
+                    {% include "plats/partiels/carte_plat.html" %}
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
 {% endblock %}
