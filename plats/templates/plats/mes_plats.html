@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block titre %}Mes plats - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>Mes plats</h1>
+    <p><a href="{% url 'plats:creer' %}">Ajouter un plat</a></p>
+    {% include "plats/partiels/liste_plats.html" %}
+{% endblock %}

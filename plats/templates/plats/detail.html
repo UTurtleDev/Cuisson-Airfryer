@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block titre %}{{ plat.nom }} - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <article class="plat">
+        <h1>{{ plat.nom }}</h1>
+        <p class="auteur">Par {{ plat.proprietaire.nom_affiche }}</p>
+
+        {% if plat.image %}
+            <img src="{{ plat.image.url }}" alt="{{ plat.nom }}">
+        {% endif %}
+
+        {% if plat.categories.all %}
+            <ul class="categories">
+                {% for categorie in plat.categories.all %}<li>{{ categorie.nom }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if plat.description %}<p>{{ plat.description|linebreaks }}</p>{% endif %}
+
+        <dl class="informations">
+            <dt>Nombre de personnes</dt><dd>{{ plat.nombre_personnes }}</dd>
+            {% if plat.temps_preparation_minutes %}
+                <dt>Préparation</dt><dd>{{ plat.temps_preparation_minutes }} min</dd>
+            {% endif %}
+        </dl>
+
+        {% if plat.plat_origine %}
+            <p class="origine">
+                Copié depuis
+                <a href="{{ plat.plat_origine.get_absolute_url }}">{{ plat.plat_origine.nom }}</a>
+                de {{ plat.plat_origine.proprietaire.nom_affiche }}.
+            </p>
+        {% endif %}
+
+        {% if plat.proprietaire == user %}
+            <p class="actions">
+                <a href="{% url 'plats:modifier' plat.slug %}">Modifier</a>
+                <a href="{% url 'plats:supprimer' plat.slug %}">Supprimer</a>
+            </p>
+        {% endif %}
+
+        {# Historique des tests de cuisson : lot 3. #}
+    </article>
+{% endblock %}

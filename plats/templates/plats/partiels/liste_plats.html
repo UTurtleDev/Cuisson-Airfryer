@@ -1,0 +1,9 @@
+{# Fragment renvoyé par HTMX lors de la recherche et des filtres (lot 4). #}
+<div id="resultats" class="grille-plats">
+    {% for plat in plats %}
+        {% include "plats/partiels/carte_plat.html" %}
+    {% empty %}
+        <p>Aucun plat pour le moment.</p>
+    {% endfor %}
+</div>
+{% include "partials/pagination.html" %}

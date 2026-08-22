@@ -5,5 +5,10 @@
 {% block contenu %}
     <h1>Tableau de bord</h1>
     <p>Bonjour {{ user.prenom|default:user.email }}.</p>
-    {# Raccourcis vers les plats, les derniers tests et les favoris (lots 2 et 3). #}
+    <ul class="raccourcis">
+        <li><a href="{% url 'plats:creer' %}">Ajouter un plat</a></li>
+        <li><a href="{% url 'plats:mes_plats' %}">Mes plats</a></li>
+        <li><a href="{% url 'plats:liste' %}">Tous les plats de la famille</a></li>
+    </ul>
+    {# Derniers tests de cuisson et favoris : lots 3 et 6. #}
 {% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block titre %}Supprimer {{ plat.nom }}{% endblock %}
+
+{% block contenu %}
+    <h1>Supprimer {{ plat.nom }} ?</h1>
+    <p>
+        Cette suppression est définitive et emporte tous les tests de cuisson
+        enregistrés pour ce plat.
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Supprimer définitivement</button>
+        <a href="{{ plat.get_absolute_url }}">Annuler</a>
+    </form>
+{% endblock %}

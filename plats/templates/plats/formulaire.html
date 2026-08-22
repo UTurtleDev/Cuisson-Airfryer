@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block titre %}{{ titre }} - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>{{ titre }}</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include "partials/formulaire.html" with formulaire=form %}
+        <button type="submit">Enregistrer</button>
+    </form>
+{% endblock %}
