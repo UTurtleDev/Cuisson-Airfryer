@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block titre %}Inscription - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>Créer un compte</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% include "partials/formulaire.html" with formulaire=form %}
+        <button type="submit">Créer mon compte</button>
+    </form>
+    <p>Déjà inscrit ? <a href="{% url 'users:connexion' %}">Se connecter</a></p>
+{% endblock %}

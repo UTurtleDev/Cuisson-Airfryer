@@ -1,0 +1,4 @@
+{# Réponse HTMX : remplace la zone de messages sans toucher à la cible principale. #}
+<div id="messages" class="messages" hx-swap-oob="true">
+    {% include "partials/messages.html" %}
+</div>

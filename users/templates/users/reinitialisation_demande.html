@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block titre %}Mot de passe oublié{% endblock %}
+
+{% block contenu %}
+    <h1>Mot de passe oublié</h1>
+    <p>Indiquez votre adresse électronique, un lien de réinitialisation vous sera envoyé.</p>
+    <form method="post">
+        {% csrf_token %}
+        {% include "partials/formulaire.html" with formulaire=form %}
+        <button type="submit">Envoyer le lien</button>
+    </form>
+{% endblock %}

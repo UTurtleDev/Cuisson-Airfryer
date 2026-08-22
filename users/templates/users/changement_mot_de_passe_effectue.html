@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block titre %}Mot de passe modifié{% endblock %}
+
+{% block contenu %}
+    <h1>Mot de passe modifié</h1>
+    <p>Votre mot de passe a bien été changé.</p>
+    <p><a href="{% url 'principal:tableau_de_bord' %}">Retour au tableau de bord</a></p>
+{% endblock %}

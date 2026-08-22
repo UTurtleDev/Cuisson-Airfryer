@@ -1,0 +1,59 @@
+/*
+   Feuille de style minimale et provisoire.
+   Le design définitif sera réalisé séparément avec Claude Design :
+   ce fichier ne pose qu'une mise en page lisible pendant le développement.
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+}
+
+.entete,
+.contenu,
+.pied-de-page,
+.messages {
+    max-width: 60rem;
+    margin-inline: auto;
+    padding: 1rem;
+}
+
+.entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.navigation {
+    display: flex;
+    gap: 1rem;
+}
+
+.liste-messages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.message {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid currentColor;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 150ms ease-in;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    opacity: 1;
+}

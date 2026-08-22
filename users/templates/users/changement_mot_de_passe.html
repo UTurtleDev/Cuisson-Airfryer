@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block titre %}Changer mon mot de passe{% endblock %}
+
+{% block contenu %}
+    <h1>Changer mon mot de passe</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% include "partials/formulaire.html" with formulaire=form %}
+        <button type="submit">Valider</button>
+    </form>
+{% endblock %}

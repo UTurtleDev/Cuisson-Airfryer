@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block titre %}Connexion - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>Connexion</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% include "partials/formulaire.html" with formulaire=form %}
+        <button type="submit">Se connecter</button>
+    </form>
+    <p><a href="{% url 'users:reinitialisation' %}">Mot de passe oublié ?</a></p>
+    <p>Pas encore de compte ? <a href="{% url 'users:inscription' %}">S'inscrire</a></p>
+{% endblock %}

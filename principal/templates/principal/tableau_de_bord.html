@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block titre %}Tableau de bord - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>Tableau de bord</h1>
+    <p>Bonjour {{ user.prenom|default:user.email }}.</p>
+    {# Raccourcis vers les plats, les derniers tests et les favoris (lots 2 et 3). #}
+{% endblock %}

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Environnements virtuels
+.venv
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+medias/
+*.log
+
+# Variables d'environnement
+.env
+
+# Système
+.DS_Store
+
+# Spécification (document de travail privé)
+testcuisson_specification.md

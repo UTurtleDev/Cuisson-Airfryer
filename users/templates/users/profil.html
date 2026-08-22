@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block titre %}Mon profil - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>Mon profil</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% include "partials/formulaire.html" with formulaire=form %}
+        <button type="submit">Enregistrer</button>
+    </form>
+    <p><a href="{% url 'users:changement_mot_de_passe' %}">Changer mon mot de passe</a></p>
+{% endblock %}

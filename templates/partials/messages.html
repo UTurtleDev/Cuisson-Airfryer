@@ -1,0 +1,8 @@
+{# Inclus dans base.html et renvoyé en swap hors bande par les vues HTMX. #}
+{% if messages %}
+    <ul class="liste-messages">
+        {% for message in messages %}
+            <li class="message message--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
