@@ -1,6 +1,9 @@
 from django import forms
+from django.contrib.auth import get_user_model
 
 from plats.models import Categorie, Plat, TestCuisson
+
+Utilisateur = get_user_model()
 
 
 class FormulairePlat(forms.ModelForm):
@@ -82,10 +85,40 @@ class FormulaireFiltrePlats(forms.Form):
         min_value=1,
         widget=forms.NumberInput(attrs={"placeholder": "15"}),
     )
-    mes_plats_uniquement = forms.BooleanField(label="Seulement mes plats", required=False)
+    membre = forms.ChoiceField(label="Membre", required=False, choices=[])
     avec_meilleure_combinaison = forms.BooleanField(
         label="Avec une meilleure combinaison", required=False
     )
+
+    #: Valeur réservée pour « mes propres plats », les autres choix étant des pk.
+    MOI = "moi"
+
+    def __init__(self, *args, utilisateur=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.utilisateur = utilisateur
+        self.fields["membre"].choices = self.choix_de_membres()
+
+    def choix_de_membres(self):
+        """Construit la liste déroulante des membres.
+
+        Seuls les membres actifs ayant au moins un plat y figurent : proposer
+        un membre dont la liste serait vide n'apporterait rien.
+        """
+        choix = [("", "Tous les membres")]
+
+        connecte = self.utilisateur is not None and self.utilisateur.is_authenticated
+        if connecte:
+            choix.append((self.MOI, "Seulement mes plats"))
+
+        autres = Utilisateur.objects.filter(is_active=True, plats__isnull=False).distinct()
+        if connecte:
+            autres = autres.exclude(pk=self.utilisateur.pk)
+
+        choix += [
+            (str(membre.pk), membre.nom_affiche)
+            for membre in autres.order_by("prenom", "nom", "email")
+        ]
+        return choix
 
     def filtrer(self, queryset, utilisateur):
         """Applique les critères renseignés, dans l'ordre, sur le queryset."""
@@ -96,8 +129,12 @@ class FormulaireFiltrePlats(forms.Form):
         queryset = queryset.duree_cuisson_maximum(donnees.get("duree_maximum"))
         queryset = queryset.preparation_maximum(donnees.get("preparation_maximum"))
 
-        if donnees.get("mes_plats_uniquement"):
+        membre = donnees.get("membre")
+        if membre == self.MOI:
             queryset = queryset.de(utilisateur)
+        elif membre:
+            queryset = queryset.filter(proprietaire_id=membre)
+
         if donnees.get("avec_meilleure_combinaison"):
             queryset = queryset.avec_meilleur_test()
 

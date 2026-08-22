@@ -33,7 +33,9 @@ class ListePlatsView(LoginRequiredMixin, ListView):
 
     def get_formulaire(self):
         if not hasattr(self, "_formulaire"):
-            self._formulaire = FormulaireFiltrePlats(self.request.GET or None)
+            self._formulaire = FormulaireFiltrePlats(
+                self.request.GET or None, utilisateur=self.request.user
+            )
         return self._formulaire
 
     def get_queryset(self):

@@ -58,8 +58,14 @@ class RechercheEtFiltresTest(TestCase):
         self.assertEqual(self.resultats(preparation_maximum=10), [self.onion])
 
     def test_filtre_mes_plats(self):
-        resultats = self.resultats(mes_plats_uniquement="on")
+        resultats = self.resultats(membre="moi")
         self.assertCountEqual(resultats, [self.hamburger, self.poulet])
+
+    def test_filtre_sur_un_autre_membre(self):
+        self.assertEqual(self.resultats(membre=self.autre.pk), [self.onion])
+
+    def test_filtre_membre_vide_ne_filtre_rien(self):
+        self.assertEqual(len(self.resultats(membre="")), 3)
 
     def test_filtres_combines(self):
         """Recherche + catégorie + durée, l'exemple de la spécification."""
@@ -174,3 +180,55 @@ class CompteurResultatsTest(TestCase):
     def test_compteur_sur_mes_plats(self):
         reponse = self.client.get(reverse("plats:mes_plats"))
         self.assertContains(reponse, "6 plats")
+
+
+class ListeDeroulanteMembresTest(TestCase):
+    def setUp(self):
+        self.membre = creer_membre("sebastien@exemple.fr", prenom="Sébastien", nom="Martin")
+        self.claire = creer_membre("claire@exemple.fr", prenom="Claire", nom="Martin")
+        self.sans_plat = creer_membre("lucas@exemple.fr", prenom="Lucas")
+        creer_plat(self.membre, nom="Hamburger")
+        creer_plat(self.claire, nom="Gnocchi")
+        self.client.force_login(self.membre)
+
+    def choix(self):
+        reponse = self.client.get(reverse("plats:liste"))
+        return reponse.context["formulaire_filtres"].fields["membre"].choices
+
+    def test_premier_choix_tous_les_membres(self):
+        self.assertEqual(self.choix()[0], ("", "Tous les membres"))
+
+    def test_second_choix_mes_plats(self):
+        self.assertEqual(self.choix()[1], ("moi", "Seulement mes plats"))
+
+    def test_les_autres_membres_sont_proposes(self):
+        libelles = [libelle for _, libelle in self.choix()]
+        self.assertIn("Claire Martin", libelles)
+
+    def test_le_membre_connecte_n_apparait_pas_deux_fois(self):
+        libelles = [libelle for _, libelle in self.choix()]
+        self.assertNotIn("Sébastien Martin", libelles)
+
+    def test_membre_sans_plat_absent(self):
+        libelles = [libelle for _, libelle in self.choix()]
+        self.assertNotIn("Lucas", libelles)
+
+    def test_membre_desactive_absent(self):
+        self.claire.is_active = False
+        self.claire.save()
+        libelles = [libelle for _, libelle in self.choix()]
+        self.assertNotIn("Claire Martin", libelles)
+
+    def test_liste_deroulante_presente_dans_la_page(self):
+        reponse = self.client.get(reverse("plats:liste"))
+        self.assertContains(reponse, '<select name="membre"')
+        self.assertContains(reponse, "Claire Martin")
+        self.assertNotContains(reponse, "Seulement mes plats</label>")
+
+    def test_filtrage_par_un_autre_membre_depuis_la_page(self):
+        reponse = self.client.get(reverse("plats:liste"), {"membre": self.claire.pk})
+        # On vise les liens des plats : le mot « Hamburger » apparaît aussi
+        # dans le texte indicatif du champ de recherche.
+        self.assertContains(reponse, 'href="/plats/gnocchi/"')
+        self.assertNotContains(reponse, 'href="/plats/hamburger/"')
+        self.assertContains(reponse, "1 plat")
