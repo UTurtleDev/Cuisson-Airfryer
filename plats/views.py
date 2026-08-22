@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -106,7 +106,20 @@ class DetailPlatView(LoginRequiredMixin, DetailView):
         return contexte
 
 
-class CreerPlatView(LoginRequiredMixin, CreateView):
+class DestinationApresEnregistrementMixin:
+    """Envoie vers la recette si l'utilisateur a choisi ce bouton.
+
+    Deux boutons pour deux usages : un plat qui se limite à ses essais de
+    cuisson, ou un plat qui porte une recette complète.
+    """
+
+    def get_success_url(self):
+        if self.request.POST.get("suite") == "recette":
+            return reverse("plats:modifier_recette", kwargs={"slug": self.object.slug})
+        return super().get_success_url()
+
+
+class CreerPlatView(DestinationApresEnregistrementMixin, LoginRequiredMixin, CreateView):
     model = Plat
     form_class = FormulairePlat
     template_name = "plats/formulaire.html"
@@ -122,7 +135,9 @@ class CreerPlatView(LoginRequiredMixin, CreateView):
         return contexte
 
 
-class ModifierPlatView(ProprietaireRequisMixin, UpdateView):
+class ModifierPlatView(
+    DestinationApresEnregistrementMixin, ProprietaireRequisMixin, UpdateView
+):
     model = Plat
     form_class = FormulairePlat
     template_name = "plats/formulaire.html"

@@ -171,7 +171,7 @@ JeuIngredients = forms.models.inlineformset_factory(
     Plat,
     Ingredient,
     form=FormulaireIngredient,
-    extra=3,
+    extra=8,
     can_delete=True,
 )
 
@@ -179,7 +179,7 @@ JeuEtapes = forms.models.inlineformset_factory(
     Plat,
     EtapePreparation,
     form=FormulaireEtape,
-    extra=3,
+    extra=5,
     can_delete=True,
 )
 

@@ -4,9 +4,22 @@
 
 {% block contenu %}
     <h1>{{ titre }}</h1>
+
+    <p class="explication">
+        Un plat peut se limiter à ses essais de cuisson, comme des cordons bleus
+        sortis du congélateur où seuls la température et le temps comptent. Il peut
+        aussi porter une recette complète, avec ingrédients et étapes.
+    </p>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% include "partials/formulaire.html" with formulaire=form %}
-        <button type="submit">Enregistrer</button>
+
+        <p class="actions actions--enregistrement">
+            <button type="submit">Enregistrer</button>
+            <button type="submit" name="suite" value="recette">
+                Enregistrer puis écrire la recette
+            </button>
+        </p>
     </form>
 {% endblock %}

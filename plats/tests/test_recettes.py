@@ -44,7 +44,7 @@ class LibelleIngredientTest(TestCase):
 
     def test_unite_affichee_en_toutes_lettres(self):
         ingredient = creer_ingredient(self.plat, "huile", "2", "cs")
-        self.assertEqual(ingredient.libelle, "2 cuillère à soupe de huile")
+        self.assertEqual(ingredient.libelle, "2 cuillère à soupe d'huile")
 
 
 class AdaptationQuantitesTest(TestCase):
@@ -340,3 +340,136 @@ class AccesRecetteTest(TestCase):
         self.assertEqual(reponse.status_code, 200)
         self.assertContains(reponse, "Ingrédients")
         self.assertContains(reponse, "Étapes de préparation")
+
+
+class ParcoursCreationTest(TestCase):
+    """Les deux usages doivent se choisir dès la création du plat."""
+
+    def setUp(self):
+        self.membre = creer_membre()
+        self.client.force_login(self.membre)
+
+    def donnees_plat(self, nom):
+        return {"nom": nom, "description": "", "nombre_personnes": 4}
+
+    def test_les_deux_boutons_sont_proposes(self):
+        reponse = self.client.get(reverse("plats:creer"))
+        self.assertContains(reponse, "Enregistrer")
+        self.assertContains(reponse, "Enregistrer puis écrire la recette")
+
+    def test_plat_simple_va_vers_la_fiche(self):
+        """Cordons bleus surgelés : température et temps suffisent."""
+        from plats.models import Plat
+
+        reponse = self.client.post(reverse("plats:creer"), self.donnees_plat("Cordon bleu"))
+        plat = Plat.objects.get(nom="Cordon bleu")
+        self.assertRedirects(reponse, plat.get_absolute_url())
+
+    def test_plat_avec_recette_va_vers_la_recette(self):
+        """Poulet au curry : on enchaîne directement sur les ingrédients."""
+        from plats.models import Plat
+
+        donnees = self.donnees_plat("Poulet au curry")
+        donnees["suite"] = "recette"
+        reponse = self.client.post(reverse("plats:creer"), donnees)
+        plat = Plat.objects.get(nom="Poulet au curry")
+        self.assertRedirects(
+            reponse, reverse("plats:modifier_recette", args=[plat.slug])
+        )
+
+    def test_le_plat_est_bien_cree_dans_les_deux_cas(self):
+        from plats.models import Plat
+
+        self.client.post(reverse("plats:creer"), self.donnees_plat("Cordon bleu"))
+        donnees = self.donnees_plat("Poulet au curry")
+        donnees["suite"] = "recette"
+        self.client.post(reverse("plats:creer"), donnees)
+        self.assertEqual(Plat.objects.filter(proprietaire=self.membre).count(), 2)
+
+    def test_modification_peut_aussi_enchainer_sur_la_recette(self):
+        plat = creer_plat(self.membre, nom="Poulet au curry")
+        donnees = self.donnees_plat("Poulet au curry")
+        donnees["suite"] = "recette"
+        reponse = self.client.post(reverse("plats:modifier", args=[plat.slug]), donnees)
+        self.assertRedirects(
+            reponse, reverse("plats:modifier_recette", args=[plat.slug])
+        )
+
+    def test_assez_de_lignes_pour_une_vraie_recette(self):
+        """Sans JavaScript, les lignes vides doivent être fournies d'avance."""
+        plat = creer_plat(self.membre, nom="Poulet au curry")
+        reponse = self.client.get(reverse("plats:modifier_recette", args=[plat.slug]))
+        self.assertEqual(reponse.context["jeux"]["ingredients"].total_form_count(), 8)
+        self.assertEqual(reponse.context["jeux"]["etapes"].total_form_count(), 5)
+
+    def test_recette_complete_enregistree(self):
+        """Le cas concret : poulet, huile d'olive, curry en poudre."""
+        plat = creer_plat(self.membre, nom="Poulet au curry", nombre_personnes=4)
+        donnees = {
+            "ingredients-TOTAL_FORMS": "3",
+            "ingredients-INITIAL_FORMS": "0",
+            "ingredients-MIN_NUM_FORMS": "0",
+            "ingredients-MAX_NUM_FORMS": "1000",
+            "ingredients-0-nom": "blanc de poulet",
+            "ingredients-0-quantite": "600",
+            "ingredients-0-unite": "g",
+            "ingredients-1-nom": "huile d'olive",
+            "ingredients-1-quantite": "1",
+            "ingredients-1-unite": "cs",
+            "ingredients-2-nom": "curry en poudre",
+            "ingredients-2-quantite": "",
+            "ingredients-2-unite": "",
+            "etapes-TOTAL_FORMS": "1",
+            "etapes-INITIAL_FORMS": "0",
+            "etapes-MIN_NUM_FORMS": "0",
+            "etapes-MAX_NUM_FORMS": "1000",
+            "etapes-0-texte": "Enrober le poulet d'huile et de curry.",
+        }
+        self.client.post(reverse("plats:modifier_recette", args=[plat.slug]), donnees)
+
+        libelles = [ingredient.libelle for ingredient in plat.ingredients.all()]
+        self.assertEqual(
+            libelles,
+            [
+                "600 g de blanc de poulet",
+                "1 cuillère à soupe d'huile d'olive",
+                "curry en poudre",
+            ],
+        )
+        self.assertEqual(plat.etapes.count(), 1)
+
+
+class ElisionTest(TestCase):
+    """« de farine » mais « d'huile » : l'élision doit suivre le mot."""
+
+    def setUp(self):
+        self.plat = creer_plat(creer_membre())
+
+    def libelle(self, nom, unite="g"):
+        return creer_ingredient(self.plat, nom, "100", unite).libelle
+
+    def test_consonne(self):
+        self.assertEqual(self.libelle("farine"), "100 g de farine")
+
+    def test_voyelle(self):
+        self.assertEqual(self.libelle("origan"), "100 g d'origan")
+
+    def test_h_muet(self):
+        self.assertEqual(
+            creer_ingredient(self.plat, "huile d'olive", "1", "cs").libelle,
+            "1 cuillère à soupe d'huile d'olive",
+        )
+
+    def test_h_aspire(self):
+        self.assertEqual(self.libelle("haricots verts"), "100 g de haricots verts")
+
+    def test_voyelle_accentuee(self):
+        self.assertEqual(self.libelle("échalotes"), "100 g d'échalotes")
+
+    def test_majuscule(self):
+        self.assertEqual(self.libelle("Emmental"), "100 g d'Emmental")
+
+    def test_sans_unite_pas_de_preposition(self):
+        self.assertEqual(
+            creer_ingredient(self.plat, "œufs", "2", "").libelle, "2 œufs"
+        )

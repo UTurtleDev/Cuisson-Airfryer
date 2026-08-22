@@ -10,6 +10,23 @@ from django.utils.text import slugify
 from plats.managers import PlatQuerySet
 
 
+#: Mots commençant par un h aspiré, devant lequel « de » ne s'élide pas.
+H_ASPIRE = ("haricot", "hareng", "homard", "hachis", "houmous", "hot-dog")
+
+
+def elider(nom):
+    """Renvoie « de farine » ou « d'huile », selon l'initiale du mot.
+
+    Le h aspiré fait exception : on dit « de haricots », pas « d'haricots ».
+    """
+    premier_mot = nom.lstrip().lower()
+    if premier_mot.startswith(H_ASPIRE):
+        return f"de {nom}"
+    if premier_mot[:1] in "aeiouyâàéèêëîïôöûùh":
+        return f"d'{nom}"
+    return f"de {nom}"
+
+
 def format_nombre(quantite):
     """Affiche une quantité sans décimales inutiles : 250, 2.5, 0.75."""
     quantite = quantite.normalize()
@@ -326,7 +343,7 @@ class Ingredient(models.Model):
             return self.nom
         nombre = format_nombre(quantite)
         if self.unite:
-            return f"{nombre} {self.get_unite_display()} de {self.nom}"
+            return f"{nombre} {self.get_unite_display()} {elider(self.nom)}"
         return f"{nombre} {self.nom}"
 
 

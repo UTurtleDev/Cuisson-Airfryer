@@ -280,3 +280,9 @@ a {
     padding: 0.3rem 0.8rem;
     text-decoration: none;
 }
+
+.actions--enregistrement {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
