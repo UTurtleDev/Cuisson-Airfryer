@@ -46,15 +46,15 @@
             {% endif %}
         </p>
 
-        {% if plat.proprietaire == user %}
-            <p class="actions">
-                <a href="{% url 'plats:modifier' plat.slug %}">Modifier</a>
-                <a href="{% url 'plats:supprimer' plat.slug %}">Supprimer</a>
-            </p>
-        {% endif %}
-
         {% if est_proprietaire %}
-            <p><a href="{% url 'plats:creer_test' plat.slug %}">Ajouter un test de cuisson</a></p>
+            <p class="actions actions--proprietaire">
+                <a href="{% url 'plats:creer_test' plat.slug %}">Ajouter un test de cuisson</a>
+                <a href="{% url 'plats:modifier_recette' plat.slug %}">
+                    {% if plat.a_une_recette %}Modifier la recette{% else %}Ajouter une recette{% endif %}
+                </a>
+                <a href="{% url 'plats:modifier' plat.slug %}">Modifier le plat</a>
+                <a href="{% url 'plats:supprimer' plat.slug %}">Supprimer le plat</a>
+            </p>
         {% endif %}
 
         {% include "plats/partiels/recette.html" %}

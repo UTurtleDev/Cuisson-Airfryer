@@ -110,7 +110,7 @@ class AffichageRecetteTest(TestCase):
     def test_plat_sans_recette(self):
         vide = creer_plat(self.membre, nom="Onion rings")
         reponse = self.client.get(vide.get_absolute_url())
-        self.assertContains(reponse, "Aucune recette pour ce plat")
+        self.assertContains(reponse, "Aucune recette n'est encore écrite")
 
     def test_lien_de_modification_reserve_au_proprietaire(self):
         self.client.force_login(self.autre)
@@ -290,3 +290,53 @@ class RecetteEtCopieTest(TestCase):
 
         copie = copier_plat(plat, copieur)
         self.assertEqual([i.nom for i in copie.ingredients.all()], ["farine", "sucre"])
+
+
+class AccesRecetteTest(TestCase):
+    """La recette doit être atteignable sans chercher dans la page."""
+
+    def setUp(self):
+        self.membre = creer_membre()
+        self.autre = creer_membre("autre@exemple.fr")
+        self.plat = creer_plat(self.membre, nom="Hamburger")
+        self.client.force_login(self.membre)
+
+    def contenu(self, plat=None):
+        return self.client.get((plat or self.plat).get_absolute_url()).content.decode()
+
+    def test_lien_ajouter_une_recette_dans_les_actions(self):
+        self.assertIn("Ajouter une recette", self.contenu())
+
+    def test_lien_present_deux_fois_actions_et_bloc_recette(self):
+        """Une entrée dans la barre d'actions, une dans le bloc recette vide."""
+        url = reverse("plats:modifier_recette", args=[self.plat.slug])
+        self.assertEqual(self.contenu().count(url), 2)
+
+    def test_le_libelle_devient_modifier_quand_la_recette_existe(self):
+        creer_ingredient(self.plat, "farine", "250", "g")
+        contenu = self.contenu()
+        self.assertIn("Modifier la recette", contenu)
+        self.assertNotIn("Ajouter une recette", contenu)
+
+    def test_aucun_lien_de_recette_pour_les_autres_membres(self):
+        self.client.force_login(self.autre)
+        contenu = self.contenu()
+        self.assertNotIn("Ajouter une recette", contenu)
+        self.assertNotIn(reverse("plats:modifier_recette", args=[self.plat.slug]), contenu)
+
+    def test_toutes_les_actions_du_proprietaire_presentes(self):
+        contenu = self.contenu()
+        for libelle in [
+            "Ajouter un test de cuisson",
+            "Ajouter une recette",
+            "Modifier le plat",
+            "Supprimer le plat",
+        ]:
+            with self.subTest(libelle=libelle):
+                self.assertIn(libelle, contenu)
+
+    def test_page_de_recette_accessible(self):
+        reponse = self.client.get(reverse("plats:modifier_recette", args=[self.plat.slug]))
+        self.assertEqual(reponse.status_code, 200)
+        self.assertContains(reponse, "Ingrédients")
+        self.assertContains(reponse, "Étapes de préparation")

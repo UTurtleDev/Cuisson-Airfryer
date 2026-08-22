@@ -45,17 +45,21 @@
             </ol>
         {% endif %}
     {% else %}
-        <p>
-            Aucune recette pour ce plat.
-            {% if est_proprietaire %}
-                <a href="{% url 'plats:modifier_recette' plat.slug %}">En écrire une</a>.
-            {% endif %}
-        </p>
+        <p>Aucune recette n'est encore écrite pour ce plat.</p>
+        {% if est_proprietaire %}
+            <p class="actions">
+                <a class="lien-action" href="{% url 'plats:modifier_recette' plat.slug %}">
+                    Ajouter une recette
+                </a>
+            </p>
+        {% endif %}
     {% endif %}
 
     {% if est_proprietaire and plat.a_une_recette %}
         <p class="actions">
-            <a href="{% url 'plats:modifier_recette' plat.slug %}">Modifier la recette</a>
+            <a class="lien-action" href="{% url 'plats:modifier_recette' plat.slug %}">
+                Modifier la recette
+            </a>
         </p>
     {% endif %}
 </section>
