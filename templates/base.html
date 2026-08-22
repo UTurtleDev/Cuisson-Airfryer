@@ -17,6 +17,7 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'plats:liste' %}">Les plats</a>
                     <a href="{% url 'plats:mes_plats' %}">Mes plats</a>
+                    <a href="{% url 'plats:favoris' %}">Mes favoris</a>
                     <a href="{% url 'principal:tableau_de_bord' %}">Tableau de bord</a>
                     <a href="{% url 'users:profil' %}">{{ user.nom_affiche }}</a>
                     <form method="post" action="{% url 'users:deconnexion' %}">

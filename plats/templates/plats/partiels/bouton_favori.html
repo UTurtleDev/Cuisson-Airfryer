@@ -1,0 +1,14 @@
+{% comment %}
+    Bouton favori. Il se remplace lui-même : la réponse HTMX ne renvoie que
+    ce fragment, pas la carte ni la page.
+{% endcomment %}
+<button
+    type="button"
+    id="favori-{{ plat.pk }}"
+    class="bouton-favori {% if plat.est_favori %}bouton-favori--actif{% endif %}"
+    aria-pressed="{% if plat.est_favori %}true{% else %}false{% endif %}"
+    hx-post="{% url 'plats:basculer_favori' plat.slug %}"
+    hx-target="this"
+    hx-swap="outerHTML">
+    {% if plat.est_favori %}♥ En favori{% else %}♡ Ajouter aux favoris{% endif %}
+</button>

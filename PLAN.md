@@ -204,7 +204,7 @@ JavaScript maison : uniquement le menu mobile et l'aperçu d'image avant envoi. 
 
 ## 5. Découpage des lots (un lot = un commit vérifiable)
 
-État : lots 0 à 5 réalisés, 127 tests automatisés au vert.
+État : lots 0 à 6 réalisés, 177 tests automatisés au vert.
 
 **Lot 0 [fait] — Fondations** (spec phase 1)
 Dépendances, `environ` + `.env`, langue/fuseau, `templates/` et `static/` dans les settings, `base.html` + HTMX, `.gitignore` complet, premier commit.
@@ -225,7 +225,7 @@ Modèle `TestCuisson`, CRUD, historique sur la fiche plat, note en étoiles, dé
 **Lot 5 [fait] — Comparaison** (phase 6)
 Sélection multiple de tests d'un même plat, tableau comparatif, mise en évidence du meilleur, garde-fou : tous les tests comparés doivent appartenir au même plat.
 
-**Lot 6 — Favoris et copie** (phase 7)
+**Lot 6 [fait] — Favoris et copie** (phase 7)
 `Favori` + bascule HTMX, liste des favoris, `copier_plat()` en service testé, `plat_origine`.
 
 **Lot 7 — Recettes** (phase 8)

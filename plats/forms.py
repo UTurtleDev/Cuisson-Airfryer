@@ -89,6 +89,7 @@ class FormulaireFiltrePlats(forms.Form):
     avec_meilleure_combinaison = forms.BooleanField(
         label="Avec une meilleure combinaison", required=False
     )
+    favoris_uniquement = forms.BooleanField(label="Mes favoris", required=False)
 
     #: Valeur réservée pour « mes propres plats », les autres choix étant des pk.
     MOI = "moi"
@@ -137,5 +138,7 @@ class FormulaireFiltrePlats(forms.Form):
 
         if donnees.get("avec_meilleure_combinaison"):
             queryset = queryset.avec_meilleur_test()
+        if donnees.get("favoris_uniquement"):
+            queryset = queryset.filter(favoris__utilisateur=utilisateur)
 
         return queryset

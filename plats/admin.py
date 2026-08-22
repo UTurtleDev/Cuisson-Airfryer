@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from plats.models import Categorie, Plat, TestCuisson
+from plats.models import Categorie, Favori, Plat, TestCuisson
 
 
 @admin.register(Categorie)
@@ -75,3 +75,15 @@ class TestCuissonAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("plat", "plat__proprietaire")
+
+
+@admin.register(Favori)
+class FavoriAdmin(admin.ModelAdmin):
+    list_display = ["utilisateur", "plat", "date_ajout"]
+    list_filter = ["date_ajout"]
+    search_fields = ["utilisateur__email", "plat__nom"]
+    autocomplete_fields = ["utilisateur", "plat"]
+    readonly_fields = ["date_ajout"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("utilisateur", "plat")

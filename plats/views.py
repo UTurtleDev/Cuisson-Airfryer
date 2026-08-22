@@ -16,6 +16,7 @@ from django.views.generic.detail import SingleObjectMixin
 from plats.forms import FormulaireFiltrePlats, FormulairePlat, FormulaireTestCuisson
 from plats.mixins import PlatProprietaireRequisMixin, ProprietaireRequisMixin
 from plats.models import Plat, TestCuisson
+from plats.services import CopieImpossible, basculer_favori, copier_plat
 
 
 class ListePlatsView(LoginRequiredMixin, ListView):
@@ -40,7 +41,7 @@ class ListePlatsView(LoginRequiredMixin, ListView):
         return self._formulaire
 
     def get_queryset(self):
-        queryset = Plat.objects.visibles().avec_details()
+        queryset = Plat.objects.visibles().avec_details().avec_favori(self.request.user)
         formulaire = self.get_formulaire()
         if formulaire.is_bound and formulaire.is_valid():
             queryset = formulaire.filtrer(queryset, self.request.user)
@@ -66,7 +67,7 @@ class MesPlatsView(LoginRequiredMixin, ListView):
     template_name = "plats/mes_plats.html"
 
     def get_queryset(self):
-        return Plat.objects.de(self.request.user).avec_details()
+        return Plat.objects.de(self.request.user).avec_details().avec_favori(self.request.user)
 
 
 class DetailPlatView(LoginRequiredMixin, DetailView):
@@ -75,7 +76,7 @@ class DetailPlatView(LoginRequiredMixin, DetailView):
     template_name = "plats/detail.html"
 
     def get_queryset(self):
-        return Plat.objects.visibles().avec_details()
+        return Plat.objects.visibles().avec_details().avec_favori(self.request.user)
 
     def get_context_data(self, **kwargs):
         contexte = super().get_context_data(**kwargs)
@@ -276,3 +277,65 @@ class ComparerTestsView(LoginRequiredMixin, TemplateView):
         contexte["note_maximum"] = max((test.note for test in selection), default=None)
         contexte["est_proprietaire"] = plat.appartient_a(self.request.user)
         return contexte
+
+
+class ListeFavorisView(LoginRequiredMixin, ListView):
+    """Plats mis de côté par le membre connecté."""
+
+    model = Plat
+    context_object_name = "plats"
+    paginate_by = 12
+    template_name = "plats/favoris.html"
+
+    def get_queryset(self):
+        return (
+            Plat.objects.favoris_de(self.request.user)
+            .avec_details()
+            .avec_favori(self.request.user)
+        )
+
+
+class BasculerFavoriView(LoginRequiredMixin, SingleObjectMixin, View):
+    """Ajoute ou retire un plat des favoris. Répond aussi en HTMX."""
+
+    model = Plat
+
+    def get_queryset(self):
+        return Plat.objects.visibles()
+
+    def post(self, requete, *args, **kwargs):
+        plat = self.get_object()
+        ajoute = basculer_favori(plat, requete.user)
+
+        if requete.headers.get("HX-Request"):
+            plat.est_favori = ajoute
+            return render(requete, "plats/partiels/bouton_favori.html", {"plat": plat})
+
+        messages.success(
+            requete,
+            "Plat ajouté à vos favoris." if ajoute else "Plat retiré de vos favoris.",
+        )
+        return redirect(plat.get_absolute_url())
+
+
+class CopierPlatView(LoginRequiredMixin, SingleObjectMixin, View):
+    """Crée sa propre version du plat d'un autre membre."""
+
+    model = Plat
+
+    def get_queryset(self):
+        return Plat.objects.visibles()
+
+    def post(self, requete, *args, **kwargs):
+        plat = self.get_object()
+        try:
+            copie = copier_plat(plat, requete.user)
+        except CopieImpossible as erreur:
+            messages.error(requete, str(erreur))
+            return redirect(plat.get_absolute_url())
+
+        messages.success(
+            requete,
+            "Copie créée. Elle vous appartient, faites-en ce que vous voulez.",
+        )
+        return redirect(copie.get_absolute_url())

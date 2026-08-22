@@ -10,6 +10,7 @@
             {{ plat.meilleur_test.temperature_celsius }} °C / {{ plat.meilleur_test.duree_lisible }}
         </p>
     {% endif %}
+    {% include "plats/partiels/bouton_favori.html" %}
     {% if plat.categories.all %}
         <ul class="categories">
             {% for categorie in plat.categories.all %}<li>{{ categorie.nom }}</li>{% endfor %}

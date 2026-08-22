@@ -50,6 +50,32 @@ class PlatQuerySet(models.QuerySet):
     def recents(self):
         return self.order_by("-date_creation")
 
+    def favoris_de(self, utilisateur):
+        """Plats mis en favori par ce membre, du plus récemment ajouté."""
+        if not utilisateur.is_authenticated:
+            return self.none()
+        return self.filter(favoris__utilisateur=utilisateur).order_by("-favoris__date_ajout")
+
+    def avec_favori(self, utilisateur):
+        """Annote chaque plat d'un est_favori, en une seule requête.
+
+        Sans cette annotation, l'affichage d'une liste interrogerait la base
+        une fois par plat pour savoir s'il est en favori.
+        """
+        from plats.models import Favori
+
+        if not utilisateur.is_authenticated:
+            return self.annotate(
+                est_favori=models.Value(False, output_field=models.BooleanField())
+            )
+        return self.annotate(
+            est_favori=models.Exists(
+                Favori.objects.filter(
+                    plat=models.OuterRef("pk"), utilisateur=utilisateur
+                )
+            )
+        )
+
     def avec_meilleur_test(self):
         """Ne garde que les plats dont la meilleure combinaison est désignée."""
         return self.filter(meilleur_test__isnull=False)

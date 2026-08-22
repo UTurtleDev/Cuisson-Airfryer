@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block titre %}Mes favoris - Carnet de cuisson{% endblock %}
+
+{% block contenu %}
+    <h1>Mes favoris</h1>
+
+    {% if plats %}
+        <p class="explication">
+            Un favori est personnel : le plat reste la propriété de son auteur,
+            et le retirer d'ici ne supprime rien.
+        </p>
+        {% include "plats/partiels/liste_plats.html" %}
+    {% else %}
+        <p>
+            Aucun favori pour l'instant.
+            <a href="{% url 'plats:liste' %}">Parcourez les plats</a> et mettez de
+            côté ceux qui vous intéressent.
+        </p>
+    {% endif %}
+{% endblock %}

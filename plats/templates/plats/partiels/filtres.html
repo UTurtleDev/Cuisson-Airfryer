@@ -45,6 +45,11 @@
         {{ formulaire_filtres.avec_meilleure_combinaison.label_tag }}
     </p>
 
+    <p class="champ">
+        {{ formulaire_filtres.favoris_uniquement }}
+        {{ formulaire_filtres.favoris_uniquement.label_tag }}
+    </p>
+
     <p class="actions">
         <button type="submit">Filtrer</button>
         <a href="{% url 'plats:liste' %}">Réinitialiser</a>

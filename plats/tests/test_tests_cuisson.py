@@ -238,7 +238,10 @@ class AffichageHistoriqueTest(TestCase):
         reponse = self.client.get(self.plat.get_absolute_url())
         self.assertContains(reponse, "Historique des tests")
         self.assertNotContains(reponse, "Ajouter un test de cuisson")
-        self.assertNotContains(reponse, "hx-post")
+        # On vise l'action réservée au propriétaire, pas tout hx-post : le
+        # bouton favori en utilise un et reste ouvert à tous les membres.
+        self.assertNotContains(reponse, "Choisir comme meilleure")
+        self.assertNotContains(reponse, "/meilleur/")
 
 
 class LibellesHistoriqueTest(TestCase):

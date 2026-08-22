@@ -204,3 +204,29 @@ a {
     font-weight: 400;
     opacity: 0.75;
 }
+
+.bouton-favori {
+    background: none;
+    border: 1px solid var(--bordure);
+    border-radius: 1rem;
+    padding: 0.15rem 0.7rem;
+    color: var(--texte-discret);
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.bouton-favori--actif {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.actions-membre {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.formulaire-copie {
+    display: inline;
+}

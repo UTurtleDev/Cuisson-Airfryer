@@ -34,6 +34,18 @@
             </p>
         {% endif %}
 
+        <p class="actions-membre">
+            {% include "plats/partiels/bouton_favori.html" %}
+
+            {% if plat.proprietaire != user %}
+                <form method="post" action="{% url 'plats:copier' plat.slug %}"
+                      class="formulaire-copie">
+                    {% csrf_token %}
+                    <button type="submit">Copier ce plat chez moi</button>
+                </form>
+            {% endif %}
+        </p>
+
         {% if plat.proprietaire == user %}
             <p class="actions">
                 <a href="{% url 'plats:modifier' plat.slug %}">Modifier</a>

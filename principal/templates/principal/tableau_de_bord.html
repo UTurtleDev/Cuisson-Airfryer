@@ -10,6 +10,7 @@
         <li><a href="{% url 'plats:creer' %}">Ajouter un plat</a></li>
         <li><a href="{% url 'plats:mes_plats' %}">Mes plats ({{ nombre_de_plats }})</a></li>
         <li><a href="{% url 'plats:liste' %}">Tous les plats de la famille</a></li>
+        <li><a href="{% url 'plats:favoris' %}">Mes favoris</a></li>
     </ul>
 
     {% if derniers_tests %}

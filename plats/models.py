@@ -216,3 +216,40 @@ class TestCuisson(models.Model):
 
     def get_absolute_url(self):
         return self.plat.get_absolute_url()
+
+
+class Favori(models.Model):
+    """Plat mis de côté par un membre.
+
+    Un favori est personnel et n'a aucun effet sur le plat : il ne le copie
+    pas, ne le modifie pas, et plusieurs membres peuvent mettre le même plat
+    dans leurs favoris.
+    """
+
+    utilisateur = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="membre",
+        on_delete=models.CASCADE,
+        related_name="favoris",
+    )
+    plat = models.ForeignKey(
+        Plat,
+        verbose_name="plat",
+        on_delete=models.CASCADE,
+        related_name="favoris",
+    )
+    date_ajout = models.DateTimeField("date d'ajout", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "favori"
+        verbose_name_plural = "favoris"
+        ordering = ["-date_ajout"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["utilisateur", "plat"],
+                name="favori_unique_par_membre_et_plat",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.utilisateur} ♥ {self.plat}"
