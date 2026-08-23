@@ -1,0 +1,41 @@
+{% comment %}
+    Encadré de tête : la combinaison retenue, ou l'appel à en désigner une.
+{% endcomment %}
+{% if plat.meilleur_test %}
+    <div class="encadre-retenue">
+        <div>
+            <p class="kicker kicker--accent">Combinaison retenue</p>
+            {% include "plats/partiels/combinaison.html" with test=plat.meilleur_test taille="fiche" %}
+        </div>
+
+        <div class="encadre-separateur" aria-hidden="true"></div>
+
+        <div class="encadre-avis">
+            {% include "plats/partiels/note.html" with note=plat.meilleur_test.note %}
+            <p class="encadre-citation">
+                {% if plat.meilleur_test.commentaire %}
+                    «&nbsp;{{ plat.meilleur_test.commentaire }}&nbsp;» —
+                {% endif %}
+                essai n° {{ plat.numero_du_test_retenu }},
+                le {{ plat.meilleur_test.date_test|date:"d/m/Y" }}
+            </p>
+        </div>
+    </div>
+{% else %}
+    <div class="encadre-a-regler">
+        <p class="kicker">Encore à régler</p>
+        <p class="encadre-invite">
+            {% if tests %}
+                Aucun essai n'est encore retenu pour ce plat.
+                {% if est_proprietaire %}
+                    Comparez-les et désignez celui qui vous a convaincu.
+                {% endif %}
+            {% else %}
+                Aucun essai enregistré.
+                {% if est_proprietaire %}
+                    Lancez la première cuisson et notez le résultat.
+                {% endif %}
+            {% endif %}
+        </p>
+    </div>
+{% endif %}

@@ -174,6 +174,16 @@ class Plat(models.Model):
         tests.sort(key=lambda test: test.pk != self.meilleur_test_id)
         return tests
 
+    @property
+    def numero_du_test_retenu(self):
+        """Numéro d'essai de la combinaison retenue, pour l'affichage."""
+        if not self.meilleur_test_id:
+            return None
+        for test in self.tests_numerotes():
+            if test.pk == self.meilleur_test_id:
+                return test.numero
+        return None
+
     def definir_meilleur_test(self, test):
         """Désigne manuellement la meilleure combinaison de cuisson.
 

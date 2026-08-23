@@ -611,3 +611,256 @@
 .ligne-formulaire .field + .field {
     margin-top: 0;
 }
+
+/* ── Fiche du plat ────────────────────────────────────────────────────── */
+
+.lien-retour {
+    font-size: 13px;
+    margin-bottom: var(--space-6);
+}
+
+.lien-retour a {
+    color: var(--color-neutral-400);
+    text-decoration: none;
+}
+
+.fiche {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 48px;
+    align-items: start;
+    margin-bottom: 34px;
+}
+
+.fiche h1 {
+    font-size: 38px;
+    margin: 0 0 8px;
+}
+
+.fiche-meta {
+    font-size: 14px;
+    color: var(--color-neutral-500);
+    margin: 0 0 16px;
+}
+
+.fiche-description {
+    margin-top: var(--space-8);
+    color: var(--color-neutral-300);
+}
+
+.fiche-origine {
+    font-size: 13px;
+}
+
+.photo-absente {
+    display: grid;
+    place-items: center;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--color-neutral-500);
+}
+
+/* L'encadré de tête : la valeur que tout le monde vient chercher. */
+.encadre-retenue {
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+    padding: 22px 26px;
+    border: 1px solid var(--color-accent-800);
+    border-radius: var(--radius-md);
+}
+
+.encadre-retenue .combinaison--fiche {
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    gap: 10px;
+}
+
+.encadre-retenue .combinaison--fiche .combinaison-separateur {
+    font-size: 34px;
+}
+
+.encadre-separateur {
+    width: 1px;
+    align-self: stretch;
+    background: linear-gradient(to bottom,
+        transparent, var(--color-divider) 16px,
+        var(--color-divider) calc(100% - 16px), transparent);
+}
+
+.encadre-avis {
+    padding-bottom: 4px;
+}
+
+.encadre-avis .note {
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.encadre-citation {
+    font-size: 14px;
+    color: var(--color-neutral-400);
+    margin: 8px 0 0;
+    max-width: 260px;
+    text-wrap: pretty;
+}
+
+.encadre-a-regler {
+    padding: 22px 26px;
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md);
+}
+
+.encadre-invite {
+    margin: var(--space-2) 0 0;
+    color: var(--color-neutral-400);
+    max-width: 42ch;
+    text-wrap: pretty;
+}
+
+/* ── Tableau des essais ───────────────────────────────────────────────── */
+
+.essais {
+    margin: 40px 0;
+}
+
+.essais-entete {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.essais-entete h3 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.essais-colonnes {
+    display: grid;
+    grid-template-columns: 26px 40px 110px 150px 130px 1fr auto;
+    gap: 0 24px;
+    align-items: center;
+}
+
+.essais-titres {
+    padding: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-neutral-500);
+}
+
+.essais-ligne {
+    padding: 16px 0;
+}
+
+.combinaison--reglage {
+    font-size: 20px;
+}
+
+.essai-commentaire {
+    font-size: 14px;
+    color: var(--color-neutral-400);
+    text-wrap: pretty;
+}
+
+.essai-action {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    justify-content: flex-end;
+}
+
+.essai-action .btn {
+    font-size: 13px;
+    padding: var(--space-1) var(--space-3);
+}
+
+@media (max-width: 899px) {
+    .fiche {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+
+    .fiche-photo {
+        order: -1;
+    }
+
+    .photo-absente,
+    .photo img {
+        aspect-ratio: auto;
+        height: 150px;
+    }
+
+    .fiche h1 {
+        font-size: 26px;
+    }
+
+    .combinaison--fiche {
+        font-size: 44px;
+    }
+
+    .encadre-retenue {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    .encadre-separateur {
+        display: none;
+    }
+
+    .essais-titres {
+        display: none;
+    }
+
+    /*
+       En mobile la grille à sept colonnes n'a plus de place : les éléments
+       se replacent en flux, et les deux blocs longs prennent toute la
+       largeur. Une grille à trois colonnes ferait se chevaucher les
+       cellules restantes.
+    */
+    .essais-ligne {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-2) var(--space-4);
+    }
+
+    .essais-ligne .essai-commentaire,
+    .essais-ligne .essai-action {
+        flex-basis: 100%;
+    }
+
+    .essai-action {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .essais-ligne .note {
+        margin-left: auto;
+    }
+}
+
+.recette {
+    margin: 40px 0;
+}
+
+.recette .titre-section {
+    font-size: 15px;
+    margin: var(--space-8) 0 var(--space-3);
+    color: var(--color-neutral-300);
+}
+
+.liste-ingredients,
+.liste-etapes {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--color-neutral-300);
+}
+
+.liste-ingredients li,
+.liste-etapes li {
+    margin-bottom: var(--space-2);
+}

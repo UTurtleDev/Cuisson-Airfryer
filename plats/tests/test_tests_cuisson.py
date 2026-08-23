@@ -228,19 +228,19 @@ class AffichageHistoriqueTest(TestCase):
     def test_historique_visible_sur_la_fiche(self):
         self.client.force_login(self.membre)
         reponse = self.client.get(self.plat.get_absolute_url())
-        self.assertContains(reponse, "Historique des tests")
-        self.assertContains(reponse, "190 °C")
-        self.assertContains(reponse, "1 h 15")
-        self.assertContains(reponse, "Meilleure combinaison actuelle")
+        self.assertContains(reponse, "Les essais")
+        self.assertContains(reponse, "190")
+        self.assertContains(reponse, "75")
+        self.assertContains(reponse, "Combinaison retenue")
 
     def test_boutons_absents_pour_les_autres_membres(self):
         self.client.force_login(self.autre)
         reponse = self.client.get(self.plat.get_absolute_url())
-        self.assertContains(reponse, "Historique des tests")
-        self.assertNotContains(reponse, "Ajouter un test de cuisson")
+        self.assertContains(reponse, "Les essais")
+        self.assertNotContains(reponse, "Nouvel essai")
         # On vise l'action réservée au propriétaire, pas tout hx-post : le
         # bouton favori en utilise un et reste ouvert à tous les membres.
-        self.assertNotContains(reponse, "Choisir comme meilleure")
+        self.assertNotContains(reponse, ">Désigner<")
         self.assertNotContains(reponse, "/meilleur/")
 
 
@@ -259,21 +259,22 @@ class LibellesHistoriqueTest(TestCase):
         return self.client.get(self.plat.get_absolute_url()).content.decode()
 
     def test_action_explicite_sur_les_essais_non_retenus(self):
-        self.assertIn("Choisir comme meilleure", self.contenu())
+        self.assertIn("Désigner", self.contenu())
 
     def test_action_explicite_sur_l_essai_retenu(self):
         self.assertIn("Ne plus retenir", self.contenu())
 
     def test_ancien_libelle_ambigu_absent(self):
+        """Un bouton doit se lire comme une action, jamais comme un état."""
         contenu = self.contenu()
         self.assertNotIn(">Retirer<", contenu)
         self.assertNotIn(">Meilleure<", contenu)
 
     def test_etiquette_sur_la_ligne_retenue(self):
-        self.assertIn("★ Meilleure", self.contenu())
+        self.assertIn("Retenue", self.contenu())
 
     def test_une_seule_etiquette_dans_le_tableau(self):
-        self.assertEqual(self.contenu().count("etiquette-meilleur"), 1)
+        self.assertEqual(self.contenu().count('class="tag tag-accent"'), 1)
 
     def test_essai_retenu_affiche_en_premier(self):
         contenu = self.contenu()

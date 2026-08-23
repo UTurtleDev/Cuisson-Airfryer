@@ -1,18 +1,17 @@
 {% comment %}
-    Historique des essais de cuisson.
-    Fragment renvoyé tel quel par HTMX quand la meilleure combinaison change.
+    Les essais du plat.
+    Fragment renvoyé tel quel par HTMX quand la combinaison retenue change.
 {% endcomment %}
-<section id="historique" class="historique">
-    <h2>Historique des tests</h2>
-
-    {% if plat.meilleur_test %}
-        <p class="meilleure-combinaison">
-            Meilleure combinaison actuelle :
-            <strong>{{ plat.meilleur_test.temperature_celsius }} °C / {{ plat.meilleur_test.duree_lisible }}</strong>
-        </p>
-    {% else %}
-        <p class="meilleure-combinaison">Aucune meilleure combinaison désignée pour l'instant.</p>
-    {% endif %}
+<section id="historique" class="essais">
+    <div class="essais-entete">
+        <h3>Les essais</h3>
+        {% if tests %}
+            <span class="text-muted">
+                {{ tests|length }} essai{{ tests|length|pluralize }}
+                depuis le {{ plat.date_creation|date:"d/m" }}
+            </span>
+        {% endif %}
+    </div>
 
     {% if tests %}
         <form
@@ -22,64 +21,62 @@
             hx-get="{% url 'plats:comparer' plat.slug %}"
             hx-target="#comparaison"
             hx-swap="outerHTML">
-        <table class="tableau-tests">
-            <thead>
-                <tr>
-                    <th><span class="visuellement-cache">Comparer</span></th>
-                    <th>Essai</th>
-                    <th>Date</th>
-                    <th>Température</th>
-                    <th>Durée</th>
-                    <th>Note</th>
-                    <th>Commentaire</th>
-                    {% if est_proprietaire %}<th>Actions</th>{% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for test in tests %}
-                    <tr class="{% if test.est_meilleur %}test--meilleur{% endif %}">
-                        <td>
-                            <input type="checkbox" name="test" value="{{ test.pk }}"
-                                   id="essai-{{ test.pk }}">
-                        </td>
-                        <th scope="row">
-                            <label for="essai-{{ test.pk }}">#{{ test.numero }}</label>
-                            {% if test.est_meilleur %}
-                                <span class="etiquette-meilleur">★ Meilleure</span>
-                            {% endif %}
-                        </th>
-                        <td>{{ test.date_test|date:"d/m/Y" }}</td>
-                        <td>{{ test.temperature_celsius }} °C</td>
-                        <td>{{ test.duree_lisible }}</td>
-                        <td>{{ test.get_note_display }}</td>
-                        <td>{{ test.commentaire|default:"-" }}</td>
-                        {% if est_proprietaire %}
-                            <td class="actions">
-                                <button
-                                    type="button"
-                                    class="{% if test.est_meilleur %}bouton--retirer{% endif %}"
-                                    hx-post="{% url 'plats:definir_meilleur_test' test.pk %}"
-                                    hx-target="#historique"
-                                    hx-swap="outerHTML">
-                                    {% if test.est_meilleur %}
-                                        Ne plus retenir
-                                    {% else %}
-                                        Choisir comme meilleure
-                                    {% endif %}
-                                </button>
-                                <a href="{% url 'plats:modifier_test' test.pk %}">Modifier</a>
-                                <a href="{% url 'plats:supprimer_test' test.pk %}">Supprimer</a>
-                            </td>
+
+            <div class="essais-colonnes essais-titres filet-bas">
+                <span><span class="visuellement-cache">Comparer</span></span>
+                <span>N°</span>
+                <span>Date</span>
+                <span>Réglage</span>
+                <span>Note</span>
+                <span>Commentaire</span>
+                <span></span>
+            </div>
+
+            {% for test in tests %}
+                <div class="essais-colonnes essais-ligne filet-bas">
+                    <label class="radio">
+                        <input type="checkbox" name="test" value="{{ test.pk }}">
+                        <span class="dot"></span>
+                        <span class="visuellement-cache">Comparer l'essai n° {{ test.numero }}</span>
+                    </label>
+
+                    <span class="numero{% if test.est_meilleur %} numero--retenu{% endif %}">
+                        {{ test.numero|stringformat:"02d" }}
+                    </span>
+
+                    <span class="text-muted">{{ test.date_test|date:"d/m/Y" }}</span>
+
+                    {% include "plats/partiels/combinaison.html" with test=test taille="reglage" a_regler=None %}
+
+                    {% include "plats/partiels/note.html" with note=test.note %}
+
+                    <span class="essai-commentaire">{{ test.commentaire|default:"—" }}</span>
+
+                    <span class="essai-action">
+                        {% if test.est_meilleur %}
+                            <span class="tag tag-accent">Retenue</span>
                         {% endif %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p class="actions">
-            <button type="submit">Comparer les essais cochés</button>
-        </p>
+                        {% if est_proprietaire %}
+                            <button
+                                type="button"
+                                class="btn btn-ghost"
+                                hx-post="{% url 'plats:definir_meilleur_test' test.pk %}"
+                                hx-target="#historique"
+                                hx-swap="outerHTML">
+                                {% if test.est_meilleur %}Ne plus retenir{% else %}Désigner{% endif %}
+                            </button>
+                            <a class="btn btn-ghost" href="{% url 'plats:modifier_test' test.pk %}">Modifier</a>
+                            <a class="btn btn-ghost" href="{% url 'plats:supprimer_test' test.pk %}">Supprimer</a>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+
+            <p class="actions">
+                <button type="submit" class="btn btn-secondary">Comparer les essais cochés</button>
+            </p>
         </form>
     {% else %}
-        <p>Aucun test enregistré pour ce plat.</p>
+        <p class="text-muted">Aucun essai enregistré pour ce plat.</p>
     {% endif %}
 </section>

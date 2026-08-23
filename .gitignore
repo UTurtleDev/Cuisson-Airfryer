@@ -19,6 +19,9 @@ medias/
 # Variables d'environnement
 .env
 
+# Aperçu local des pages rendues (outil de travail)
+.apercu/
+
 # Système
 .DS_Store
 

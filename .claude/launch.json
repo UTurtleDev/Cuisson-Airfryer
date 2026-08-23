@@ -4,8 +4,26 @@
     {
       "name": "cuisson",
       "runtimeExecutable": "uv",
-      "runtimeArgs": ["run", "python", "manage.py", "runserver", "8010"],
+      "runtimeArgs": [
+        "run",
+        "python",
+        "manage.py",
+        "runserver",
+        "8010"
+      ],
       "port": 8010,
+      "autoPort": false
+    },
+    {
+      "name": "apercu",
+      "runtimeExecutable": "/usr/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8020"
+      ],
+      "cwd": ".apercu",
+      "port": 8020,
       "autoPort": false
     }
   ]

@@ -3,69 +3,75 @@
 {% block titre %}{{ plat.nom }} - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <article class="plat">
-        <h1>{{ plat.nom }}</h1>
-        <p class="auteur">Par {{ plat.proprietaire.nom_affiche }}</p>
+    <p class="lien-retour"><a href="{% url 'plats:liste' %}">← Tous les plats</a></p>
 
-        {% if plat.image %}
-            <img src="{{ plat.image.url }}" alt="{{ plat.nom }}">
-        {% endif %}
-
-        {% if plat.categories.all %}
-            <ul class="categories">
-                {% for categorie in plat.categories.all %}<li>{{ categorie.nom }}</li>{% endfor %}
-            </ul>
-        {% endif %}
-
-        {% if plat.description %}<p>{{ plat.description|linebreaks }}</p>{% endif %}
-
-        <dl class="informations">
-            <dt>Nombre de personnes</dt><dd>{{ plat.nombre_personnes }}</dd>
-            {% if plat.temps_preparation_minutes %}
-                <dt>Préparation</dt><dd>{{ plat.temps_preparation_minutes }} min</dd>
-            {% endif %}
-        </dl>
-
-        {% if plat.plat_origine %}
-            <p class="origine">
-                Copié depuis
-                <a href="{{ plat.plat_origine.get_absolute_url }}">{{ plat.plat_origine.nom }}</a>
-                de {{ plat.plat_origine.proprietaire.nom_affiche }}.
+    <div class="fiche">
+        <div class="fiche-principal">
+            <h1>{{ plat.nom }}</h1>
+            <p class="fiche-meta">
+                {{ plat.proprietaire.nom_affiche }} ·
+                {{ plat.nombre_personnes }} personne{{ plat.nombre_personnes|pluralize }} ·
+                ajouté le {{ plat.date_creation|date:"d/m" }}
             </p>
-        {% endif %}
 
-        <p class="actions-membre">
-            {% include "plats/partiels/bouton_favori.html" %}
+            <div class="chips">
+                {% for categorie in plat.categories.all %}
+                    <span class="tag tag-neutral">{{ categorie.nom }}</span>
+                {% endfor %}
+                {% if plat.est_favori %}<span class="tag tag-outline">Favori</span>{% endif %}
+            </div>
 
-            {% if plat.proprietaire != user %}
-                <form method="post" action="{% url 'plats:copier' plat.slug %}"
-                      class="formulaire-copie">
-                    {% csrf_token %}
-                    <button type="submit">Copier ce plat chez moi</button>
-                </form>
+            {% include "plats/partiels/combinaison_retenue.html" %}
+
+            <div class="actions">
+                {% if est_proprietaire %}
+                    <a class="btn btn-primary" href="{% url 'plats:creer_test' plat.slug %}">Nouvel essai</a>
+                    <a class="btn btn-secondary" href="{% url 'plats:modifier' plat.slug %}">Modifier le plat</a>
+                    <a class="btn btn-ghost" href="{% url 'plats:modifier_recette' plat.slug %}">
+                        {% if plat.a_une_recette %}Modifier la recette{% else %}Ajouter une recette{% endif %}
+                    </a>
+                {% else %}
+                    <form method="post" action="{% url 'plats:copier' plat.slug %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Copier ce plat chez moi</button>
+                    </form>
+                {% endif %}
+                {% include "plats/partiels/bouton_favori.html" %}
+                {% if est_proprietaire %}
+                    <a class="btn btn-ghost" href="{% url 'plats:supprimer' plat.slug %}">Supprimer</a>
+                {% endif %}
+            </div>
+
+            {% if plat.description %}
+                <p class="fiche-description">{{ plat.description|linebreaks }}</p>
             {% endif %}
-        </p>
 
-        {% if est_proprietaire %}
-            <p class="actions actions--proprietaire">
-                <a href="{% url 'plats:creer_test' plat.slug %}">Ajouter un test de cuisson</a>
-                <a href="{% url 'plats:modifier_recette' plat.slug %}">
-                    {% if plat.a_une_recette %}Modifier la recette{% else %}Ajouter une recette{% endif %}
-                </a>
-                <a href="{% url 'plats:modifier' plat.slug %}">Modifier le plat</a>
-                <a href="{% url 'plats:supprimer' plat.slug %}">Supprimer le plat</a>
-            </p>
-        {% endif %}
+            {% if plat.plat_origine %}
+                <p class="fiche-origine text-muted">
+                    Copié depuis
+                    <a href="{{ plat.plat_origine.get_absolute_url }}">{{ plat.plat_origine.nom }}</a>
+                    de {{ plat.plat_origine.proprietaire.nom_affiche }}.
+                </p>
+            {% endif %}
+        </div>
 
-        {% include "plats/partiels/recette.html" %}
+        <div class="fiche-photo">
+            {% if plat.image %}
+                <figure class="photo"><img src="{{ plat.image.url }}" alt="{{ plat.nom }}"></figure>
+            {% else %}
+                <div class="photo-absente"><span>photo du plat</span></div>
+            {% endif %}
+        </div>
+    </div>
 
-        {% include "plats/partiels/historique.html" %}
+    {% include "plats/partiels/recette.html" %}
 
-        {% comment %}
-            Cible du tableau comparatif. Volontairement hors du fragment
-            historique : celui-ci est remplacé entier par HTMX quand la
-            meilleure combinaison change.
-        {% endcomment %}
-        <section id="comparaison" class="comparaison"></section>
-    </article>
+    {% include "plats/partiels/historique.html" %}
+
+    {% comment %}
+        Cible du tableau comparatif. Volontairement hors du fragment
+        historique : celui-ci est remplacé entier par HTMX quand la
+        combinaison retenue change.
+    {% endcomment %}
+    <section id="comparaison" class="comparaison"></section>
 {% endblock %}

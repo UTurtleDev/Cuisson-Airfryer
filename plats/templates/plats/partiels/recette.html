@@ -3,7 +3,12 @@
     Fragment renvoyé tel quel par HTMX quand on change le nombre de convives.
 {% endcomment %}
 <section id="recette" class="recette">
-    <h2>Recette</h2>
+    <div class="essais-entete">
+        <h3>Recette</h3>
+        {% if plat.a_une_recette %}
+            <span class="text-muted">pour {{ plat.nombre_personnes }} personnes</span>
+        {% endif %}
+    </div>
 
     {% if plat.a_une_recette %}
         <form
@@ -28,7 +33,7 @@
         </form>
 
         {% if ingredients %}
-            <h3>Ingrédients</h3>
+            <h4 class="titre-section">Ingrédients</h4>
             <ul class="liste-ingredients">
                 {% for ingredient in ingredients %}
                     <li>{{ ingredient.libelle_adapte }}</li>
@@ -37,7 +42,7 @@
         {% endif %}
 
         {% if etapes %}
-            <h3>Préparation</h3>
+            <h4 class="titre-section">Préparation</h4>
             <ol class="liste-etapes">
                 {% for etape in etapes %}
                     <li>{{ etape.texte|linebreaksbr }}</li>

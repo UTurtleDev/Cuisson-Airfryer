@@ -327,10 +327,10 @@ class AccesRecetteTest(TestCase):
     def test_toutes_les_actions_du_proprietaire_presentes(self):
         contenu = self.contenu()
         for libelle in [
-            "Ajouter un test de cuisson",
+            "Nouvel essai",
             "Ajouter une recette",
             "Modifier le plat",
-            "Supprimer le plat",
+            "Supprimer",
         ]:
             with self.subTest(libelle=libelle):
                 self.assertIn(libelle, contenu)
