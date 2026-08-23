@@ -47,7 +47,7 @@ templates/               # tous les gabarits, hors des applications
     users/  plats/  principal/
 static/
     css/  js/  vendor/htmx.min.js
-medias/                  # uploads (hors git)
+media/                  # uploads (hors git)
 .env / .env.exemple
 ```
 

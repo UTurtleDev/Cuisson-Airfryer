@@ -139,8 +139,8 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = env.path("DJANGO_STATIC_ROOT", default=BASE_DIR / "staticfiles")
 
-MEDIA_URL = "medias/"
-MEDIA_ROOT = env.path("DJANGO_MEDIA_ROOT", default=BASE_DIR / "medias")
+MEDIA_URL = "media/"
+MEDIA_ROOT = env.path("DJANGO_MEDIA_ROOT", default=BASE_DIR / "media")
 
 # Le stockage à manifeste de WhiteNoise impose un collectstatic préalable :
 # on le réserve à la production.
