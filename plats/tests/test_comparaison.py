@@ -75,7 +75,7 @@ class ComparaisonTest(TestCase):
         reponse = self.comparer(self.t1, self.t3)
         self.assertEqual(reponse.status_code, 200)
         self.assertEqual(list(reponse.context["tests"]), [self.t1, self.t3])
-        self.assertContains(reponse, "Comparaison de 2 essais")
+        self.assertContains(reponse, "2 essais côte à côte")
 
     def test_ordre_chronologique_dans_le_tableau(self):
         reponse = self.comparer(self.t3, self.t1, self.t2)
@@ -97,7 +97,7 @@ class ComparaisonTest(TestCase):
         reponse = self.comparer(self.t1)
         self.assertTrue(reponse.context["selection_insuffisante"])
         self.assertContains(reponse, "au moins 2 essais")
-        self.assertNotContains(reponse, "tableau-comparaison")
+        self.assertNotContains(reponse, "comparaison-grille")
 
     def test_selection_vide(self):
         reponse = self.client.get(self.url)
@@ -111,8 +111,8 @@ class ComparaisonTest(TestCase):
     def test_meilleure_combinaison_mise_en_evidence(self):
         self.plat.definir_meilleur_test(self.t2)
         reponse = self.comparer(self.t1, self.t2, self.t3)
-        self.assertContains(reponse, "test--meilleur")
-        self.assertContains(reponse, "Meilleure combinaison retenue")
+        self.assertContains(reponse, "cartouche--retenu")
+        self.assertContains(reponse, "Déjà retenue")
 
     def test_la_comparaison_ne_designe_pas_le_meilleur(self):
         """Comparer met en avant la meilleure note, sans rien décider."""
@@ -147,7 +147,7 @@ class ComparaisonHtmxTest(TestCase):
             headers={"HX-Request": "true"},
         )
         self.assertContains(reponse, 'id="comparaison"')
-        self.assertContains(reponse, "tableau-comparaison")
+        self.assertContains(reponse, "comparaison-grille")
         self.assertNotContains(reponse, "<!DOCTYPE html>")
 
     def test_page_complete_hors_htmx(self):

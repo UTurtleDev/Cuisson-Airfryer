@@ -28,6 +28,11 @@ class AccueilTest(TestCase):
         self.assertContains(reponse, "Cuissons au point")
         self.assertContains(reponse, "Hamburger")
 
+    def test_bouton_de_creation_visible(self):
+        self.client.force_login(self.membre)
+        reponse = self.client.get(reverse("principal:accueil"))
+        self.assertContains(reponse, "Ajouter un plat")
+
     def test_plats_avec_meilleure_combinaison(self):
         self.client.force_login(self.membre)
         reponse = self.client.get(reverse("principal:accueil"))
@@ -54,13 +59,51 @@ class TableauDeBordTest(TestCase):
         reponse = self.client.get(reverse("principal:tableau_de_bord"))
         self.assertEqual(reponse.status_code, 302)
 
-    def test_ne_montre_que_mes_plats_et_mes_tests(self):
+    def test_compteurs_a_l_echelle_de_la_famille(self):
+        """Le tableau de bord est « le carnet en chiffres », pas un espace privé."""
         self.client.force_login(self.membre)
         reponse = self.client.get(reverse("principal:tableau_de_bord"))
-        self.assertEqual(reponse.context["nombre_de_plats"], 1)
-        self.assertContains(reponse, "Hamburger")
-        self.assertNotContains(reponse, "Onion rings")
-        self.assertContains(reponse, "190 °C")
+        self.assertEqual(reponse.context["nombre_de_plats"], 2)
+        self.assertEqual(reponse.context["nombre_d_essais"], 1)
+        self.assertEqual(reponse.context["nombre_a_regler"], 2)
+
+    def test_au_point_compte_les_combinaisons_retenues(self):
+        self.plat.definir_meilleur_test(self.plat.tests.first())
+        self.client.force_login(self.membre)
+        reponse = self.client.get(reverse("principal:tableau_de_bord"))
+        self.assertEqual(reponse.context["nombre_au_point"], 1)
+        self.assertEqual(reponse.context["nombre_a_regler"], 1)
+
+    def test_qui_cuisine(self):
+        self.client.force_login(self.membre)
+        reponse = self.client.get(reverse("principal:tableau_de_bord"))
+        repartition = reponse.context["qui_cuisine"]
+        self.assertEqual(len(repartition), 1)
+        self.assertEqual(repartition[0]["total"], 1)
+        self.assertEqual(repartition[0]["part"], 100)
+
+    def test_temperatures_utilisees(self):
+        self.client.force_login(self.membre)
+        reponse = self.client.get(reverse("principal:tableau_de_bord"))
+        temperatures = reponse.context["temperatures"]
+        self.assertEqual(temperatures[0]["temperature_celsius"], 190)
+        self.assertEqual(temperatures[0]["total"], 1)
+
+    def test_mes_plats_reste_personnel(self):
+        self.client.force_login(self.membre)
+        reponse = self.client.get(reverse("principal:tableau_de_bord"))
+        self.assertEqual(reponse.context["mes_plats_total"], 1)
+        self.assertEqual(list(reponse.context["mes_plats"]), [self.plat])
+
+    def test_aucune_statistique_sans_essai(self):
+        from plats.models import TestCuisson
+
+        TestCuisson.objects.all().delete()
+        self.client.force_login(self.membre)
+        reponse = self.client.get(reverse("principal:tableau_de_bord"))
+        self.assertEqual(reponse.context["qui_cuisine"], [])
+        self.assertEqual(reponse.context["temperatures"], [])
+        self.assertContains(reponse, "Aucun essai enregistré")
 
 
 class GabaritsTest(TestCase):

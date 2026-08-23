@@ -3,14 +3,26 @@
 {% block titre %}Supprimer {{ plat.nom }}{% endblock %}
 
 {% block contenu %}
-    <h1>Supprimer {{ plat.nom }} ?</h1>
-    <p>
-        Cette suppression est définitive et emporte tous les tests de cuisson
-        enregistrés pour ce plat.
-    </p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Supprimer définitivement</button>
-        <a href="{{ plat.get_absolute_url }}">Annuler</a>
-    </form>
+    <div class="dialog-page">
+        <div class="dialog elev-lg">
+            <h2 class="dialog-title">Supprimer «&nbsp;{{ plat.nom }}&nbsp;»&nbsp;?</h2>
+            <div class="dialog-body">
+                <p>
+                    {% with total=plat.tests.count %}
+                        {% if total %}
+                            Ce plat et ses {{ total }} essai{{ total|pluralize }} seront
+                            perdus définitivement, y compris la combinaison retenue.
+                        {% else %}
+                            Ce plat sera supprimé définitivement.
+                        {% endif %}
+                    {% endwith %}
+                </p>
+            </div>
+            <form method="post" class="dialog-actions">
+                {% csrf_token %}
+                <a class="btn btn-ghost" href="{{ plat.get_absolute_url }}">Annuler</a>
+                <button type="submit" class="btn btn-primary">Supprimer</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

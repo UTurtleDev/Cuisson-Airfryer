@@ -995,3 +995,201 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
 }
+
+/* ── Cartes de plat ───────────────────────────────────────────────────── */
+
+.grille-cartes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+}
+
+.carte-plat {
+    padding: var(--space-6);
+    gap: var(--space-3);
+}
+
+.carte-plat .card-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.carte-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-3);
+}
+
+.bouton-favori--actif {
+    color: var(--color-accent);
+}
+
+@media (max-width: 899px) {
+    .grille-cartes {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Comparaison ──────────────────────────────────────────────────────── */
+
+.comparaison {
+    margin: 40px 0;
+}
+
+.comparaison-grille {
+    display: grid;
+    grid-template-columns: 150px repeat(var(--colonnes), 1fr);
+    gap: 0 var(--space-6);
+    align-items: center;
+}
+
+.comparaison-grille > * {
+    padding: var(--space-4) 0;
+}
+
+.comparaison-attribut {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-neutral-500);
+}
+
+.cartouche {
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-6);
+}
+
+.cartouche--retenu {
+    border-color: var(--color-accent-800);
+}
+
+.note--haute .note {
+    font-size: 18px;
+}
+
+@media (max-width: 899px) {
+    .comparaison-grille {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .comparaison-attribut {
+        padding-top: var(--space-6);
+    }
+}
+
+/* ── Tableau de bord ──────────────────────────────────────────────────── */
+
+.bandeau-chiffres {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+    padding-bottom: var(--space-8);
+    margin-bottom: var(--space-8);
+}
+
+.chiffre-valeur--grand {
+    font-size: 44px;
+}
+
+.colonnes-statistiques {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.titre-statistique {
+    font-size: 15px;
+    color: var(--color-neutral-300);
+    margin-bottom: var(--space-6);
+}
+
+.barre-ligne {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    font-size: 13px;
+    margin-bottom: var(--space-1);
+}
+
+.barre {
+    height: 3px;
+    background: var(--color-neutral-800);
+    border-radius: 2px;
+    margin-bottom: var(--space-6);
+    overflow: hidden;
+}
+
+.barre span {
+    display: block;
+    height: 100%;
+    background: var(--color-accent);
+}
+
+.dernier-essai {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-3);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-4);
+    font-size: 13px;
+}
+
+.dernier-essai-entete {
+    flex-basis: 100%;
+    margin: 0;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--color-neutral-500);
+}
+
+.mes-plats {
+    margin-top: 48px;
+}
+
+@media (max-width: 899px) {
+    .bandeau-chiffres {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .chiffre-valeur--grand {
+        font-size: 34px;
+    }
+
+    .colonnes-statistiques {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+}
+
+/* ── Dialogues de confirmation ────────────────────────────────────────── */
+
+.dialog-page {
+    display: grid;
+    place-items: center;
+    min-height: 50vh;
+}
+
+.dialog-page .dialog {
+    width: 420px;
+    max-width: 100%;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}
+
+.mise-en-avant {
+    margin-bottom: 48px;
+}
+
+.accueil-public {
+    max-width: 620px;
+    padding: 40px 0;
+}

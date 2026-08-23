@@ -3,30 +3,26 @@
 {% block titre %}Accueil - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>Carnet de cuisson</h1>
-    <p>
-        Notez vos essais de cuisson, gardez l'historique complet et retrouvez
-        la meilleure combinaison de température et de durée pour chaque plat.
-    </p>
-
     {% if user.is_authenticated %}
+        <div class="entete-page">
+            <div>
+                <h1>Carnet de cuisson</h1>
+                <p class="sous-titre">
+                    Les réglages que la famille a trouvés, et ceux sur lesquels
+                    elle travaille en ce moment.
+                </p>
+            </div>
+            <a class="btn btn-primary" href="{% url 'plats:creer' %}">Ajouter un plat</a>
+        </div>
+
         {% if plats_avec_meilleure_combinaison %}
             <section class="mise-en-avant">
-                <h2>Cuissons au point</h2>
-                <p class="explication">Les plats dont la meilleure combinaison est trouvée.</p>
-                <div class="grille-plats">
-                    {% for plat in plats_avec_meilleure_combinaison %}
-                        {% include "plats/partiels/carte_plat.html" %}
-                    {% endfor %}
+                <div class="essais-entete">
+                    <h3>Cuissons au point</h3>
+                    <span class="text-muted">la combinaison est trouvée</span>
                 </div>
-            </section>
-        {% endif %}
-
-        {% if plats_mieux_notes %}
-            <section class="mise-en-avant">
-                <h2>Les mieux notés</h2>
-                <div class="grille-plats">
-                    {% for plat in plats_mieux_notes %}
+                <div class="grille-cartes">
+                    {% for plat in plats_avec_meilleure_combinaison %}
                         {% include "plats/partiels/carte_plat.html" %}
                     {% endfor %}
                 </div>
@@ -35,24 +31,33 @@
 
         {% if plats_recents %}
             <section class="mise-en-avant">
-                <h2>Derniers ajouts</h2>
-                <div class="grille-plats">
+                <div class="essais-entete">
+                    <h3>Derniers ajouts</h3>
+                </div>
+                <div class="grille-cartes">
                     {% for plat in plats_recents %}
                         {% include "plats/partiels/carte_plat.html" %}
                     {% endfor %}
                 </div>
             </section>
         {% else %}
-            <p>
+            <p class="text-muted">
                 Aucun plat pour le moment.
                 <a href="{% url 'plats:creer' %}">Ajoutez le premier</a>.
             </p>
         {% endif %}
     {% else %}
-        <p>
-            <a href="{% url 'users:connexion' %}">Se connecter</a>
-            ou <a href="{% url 'users:inscription' %}">créer un compte</a>
-            pour voir les plats de la famille.
-        </p>
+        <div class="accueil-public">
+            <p class="kicker kicker--accent">Airfryer · carnet de famille</p>
+            <h1 class="titre-accroche">Le bon réglage, noté une fois pour toutes.</h1>
+            <p class="accroche">
+                Chaque essai garde sa température, sa durée et ce qu'on en a pensé.
+                La combinaison retenue reste en tête de fiche, plus personne ne redevine.
+            </p>
+            <p class="actions">
+                <a class="btn btn-primary" href="{% url 'users:connexion' %}">Se connecter</a>
+                <a class="btn btn-secondary" href="{% url 'users:inscription' %}">Créer un compte</a>
+            </p>
+        </div>
     {% endif %}
 {% endblock %}

@@ -1,19 +1,36 @@
-{# Carte d'un plat, réutilisée dans les listes et les résultats HTMX. #}
-<article class="carte-plat">
-    {% if plat.image %}
-        <img src="{{ plat.image.url }}" alt="{{ plat.nom }}" loading="lazy">
-    {% endif %}
-    <h3><a href="{{ plat.get_absolute_url }}">{{ plat.nom }}</a></h3>
-    <p class="auteur">Par {{ plat.proprietaire.nom_affiche }}</p>
+{% comment %}
+    Carte d'un plat : la combinaison retenue en tête, puis le nom et les
+    relances. Utilisée sur les favoris.
+{% endcomment %}
+<article class="card elev-sm carte-plat">
     {% if plat.meilleur_test %}
-        <p class="meilleure-combinaison">
-            {{ plat.meilleur_test.temperature_celsius }} °C / {{ plat.meilleur_test.duree_lisible }}
-        </p>
+        {% include "plats/partiels/combinaison.html" with test=plat.meilleur_test taille="carte" %}
+    {% elif plat.dernier_temperature %}
+        <div class="combinaison combinaison--carte combinaison--a-regler">
+            {{ plat.dernier_temperature }}<span class="combinaison-unite">°C</span>
+            <span class="combinaison-separateur">/</span>
+            {{ plat.dernier_duree }}<span class="combinaison-unite">min</span>
+        </div>
+    {% else %}
+        <p class="text-muted">Aucun essai</p>
     {% endif %}
-    {% include "plats/partiels/bouton_favori.html" %}
-    {% if plat.categories.all %}
-        <ul class="categories">
-            {% for categorie in plat.categories.all %}<li>{{ categorie.nom }}</li>{% endfor %}
-        </ul>
-    {% endif %}
+
+    <h3 class="card-title">
+        <a href="{{ plat.get_absolute_url }}">{{ plat.nom }}</a>
+    </h3>
+
+    <div class="card-meta">
+        <span>{{ plat.proprietaire.nom_affiche }}</span>
+        {% if plat.meilleur_test %}
+            · {% include "plats/partiels/note.html" with note=plat.meilleur_test.note %}
+        {% endif %}
+    </div>
+
+    <div class="carte-actions">
+        {% if plat.proprietaire == user %}
+            <a class="btn btn-primary" href="{% url 'plats:creer_test' plat.slug %}">Nouvel essai</a>
+        {% endif %}
+        <a class="btn btn-secondary" href="{{ plat.get_absolute_url }}">La fiche</a>
+        {% include "plats/partiels/bouton_favori.html" %}
+    </div>
 </article>

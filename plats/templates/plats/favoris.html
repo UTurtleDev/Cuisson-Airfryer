@@ -3,16 +3,35 @@
 {% block titre %}Mes favoris - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>Mes favoris</h1>
+    <div class="entete-page">
+        <div>
+            <h1>Mes favoris</h1>
+            <p class="sous-titre">
+                Un favori est personnel : le plat reste la propriété de son auteur,
+                et le retirer d'ici ne supprime rien.
+            </p>
+        </div>
+    </div>
 
     {% if plats %}
-        <p class="explication">
-            Un favori est personnel : le plat reste la propriété de son auteur,
-            et le retirer d'ici ne supprime rien.
-        </p>
-        {% include "plats/partiels/liste_plats.html" %}
+        <div class="grille-cartes">
+            {% for plat in plats %}
+                {% include "plats/partiels/carte_plat.html" %}
+            {% endfor %}
+        </div>
+        {% if is_paginated %}
+            <nav class="pagination">
+                {% if page_obj.has_previous %}
+                    <a class="btn btn-ghost" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                {% endif %}
+                <span class="text-muted">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a class="btn btn-ghost" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                {% endif %}
+            </nav>
+        {% endif %}
     {% else %}
-        <p>
+        <p class="text-muted">
             Aucun favori pour l'instant.
             <a href="{% url 'plats:liste' %}">Parcourez les plats</a> et mettez de
             côté ceux qui vous intéressent.

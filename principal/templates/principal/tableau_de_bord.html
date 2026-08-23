@@ -3,36 +3,89 @@
 {% block titre %}Tableau de bord - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>Tableau de bord</h1>
-    <p>Bonjour {{ user.prenom|default:user.email }}.</p>
+    <div class="entete-page">
+        <div>
+            <h1>Le carnet en chiffres</h1>
+            <p class="sous-titre">Ce que la famille a testé, et ce qu'il reste à régler.</p>
+        </div>
+        <a class="btn btn-primary" href="{% url 'plats:creer' %}">Ajouter un plat</a>
+    </div>
 
-    <ul class="raccourcis">
-        <li><a href="{% url 'plats:creer' %}">Ajouter un plat</a></li>
-        <li><a href="{% url 'plats:mes_plats' %}">Mes plats ({{ nombre_de_plats }})</a></li>
-        <li><a href="{% url 'plats:liste' %}">Tous les plats de la famille</a></li>
-        <li><a href="{% url 'plats:favoris' %}">Mes favoris</a></li>
-    </ul>
+    <div class="bandeau-chiffres filet-bas">
+        <div class="chiffre">
+            <div class="chiffre-valeur chiffre-valeur--grand">{{ nombre_de_plats }}</div>
+            <div class="kicker">plat{{ nombre_de_plats|pluralize }}</div>
+        </div>
+        <div class="chiffre">
+            <div class="chiffre-valeur chiffre-valeur--grand">{{ nombre_d_essais }}</div>
+            <div class="kicker">essai{{ nombre_d_essais|pluralize }}</div>
+        </div>
+        <div class="chiffre">
+            <div class="chiffre-valeur chiffre-valeur--grand chiffre-valeur--accent">{{ nombre_au_point }}</div>
+            <div class="kicker">au point</div>
+        </div>
+        <div class="chiffre">
+            <div class="chiffre-valeur chiffre-valeur--grand">{{ nombre_a_regler }}</div>
+            <div class="kicker">encore à régler</div>
+        </div>
+    </div>
 
-    {% if derniers_tests %}
+    <div class="colonnes-statistiques">
         <section>
-            <h2>Mes derniers tests</h2>
-            <ul class="derniers-tests">
-                {% for test in derniers_tests %}
-                    <li>
-                        <a href="{{ test.plat.get_absolute_url }}">{{ test.plat.nom }}</a> :
-                        {{ test.temperature_celsius }} °C / {{ test.duree_lisible }},
-                        {% include 'plats/partiels/note.html' with note=test.note %}
-                        <span class="date">{{ test.date_test|date:"d/m/Y" }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
+            <h3 class="titre-statistique">Qui cuisine</h3>
+            {% for ligne in qui_cuisine %}
+                <div class="barre-ligne">
+                    <span>{{ ligne.nom }}</span>
+                    <span class="text-muted">{{ ligne.total }}</span>
+                </div>
+                <div class="barre"><span style="width: {{ ligne.part }}%"></span></div>
+            {% empty %}
+                <p class="text-muted">Aucun essai enregistré.</p>
+            {% endfor %}
         </section>
-    {% endif %}
+
+        <section>
+            <h3 class="titre-statistique">Températures utilisées</h3>
+            {% for ligne in temperatures %}
+                <div class="barre-ligne">
+                    <span>{{ ligne.temperature_celsius }} °C</span>
+                    <span class="text-muted">
+                        {{ ligne.total }} essai{{ ligne.total|pluralize }}
+                    </span>
+                </div>
+                <div class="barre"><span style="width: {{ ligne.part }}%"></span></div>
+            {% empty %}
+                <p class="text-muted">Aucun essai enregistré.</p>
+            {% endfor %}
+        </section>
+
+        <section>
+            <h3 class="titre-statistique">Derniers essais</h3>
+            {% for essai in derniers_essais %}
+                <div class="dernier-essai filet-bas">
+                    <p class="dernier-essai-entete">
+                        {{ essai.date_test|date:"d/m" }} ·
+                        {{ essai.plat.proprietaire.nom_affiche }}
+                    </p>
+                    <a href="{{ essai.plat.get_absolute_url }}">{{ essai.plat.nom }}</a>
+                    <span class="text-muted">
+                        {{ essai.temperature_celsius }} °C / {{ essai.duree_minutes }} min
+                    </span>
+                    {% include "plats/partiels/note.html" with note=essai.note %}
+                </div>
+            {% empty %}
+                <p class="text-muted">Aucun essai enregistré.</p>
+            {% endfor %}
+        </section>
+    </div>
 
     {% if mes_plats %}
-        <section>
-            <h2>Mes plats récents</h2>
-            <div class="grille-plats">
+        <section class="mes-plats">
+            <div class="essais-entete">
+                <h3>Mes plats</h3>
+                <span class="text-muted">{{ mes_plats_total }} au total</span>
+            </div>
+            <div class="grille-cartes">
                 {% for plat in mes_plats %}
                     {% include "plats/partiels/carte_plat.html" %}
                 {% endfor %}

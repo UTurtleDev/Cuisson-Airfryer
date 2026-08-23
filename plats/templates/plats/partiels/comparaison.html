@@ -1,57 +1,70 @@
 {% comment %}
-    Tableau comparatif des essais sélectionnés.
+    Comparaison des essais sélectionnés, en cartouches côte à côte.
     Fragment renvoyé tel quel par HTMX depuis la fiche du plat.
 {% endcomment %}
 <section id="comparaison" class="comparaison">
     {% if selection_insuffisante %}
         {% if tests %}
-            <p>Sélectionnez au moins {{ minimum_a_comparer }} essais pour les comparer.</p>
+            <p class="text-muted">
+                Sélectionnez au moins {{ minimum_a_comparer }} essais pour les comparer.
+            </p>
         {% endif %}
     {% else %}
-        <h2>Comparaison de {{ tests|length }} essais</h2>
-        <table class="tableau-comparaison">
-            <thead>
-                <tr>
-                    <th>Essai</th>
-                    <th>Date</th>
-                    <th>Température</th>
-                    <th>Durée</th>
-                    <th>Note</th>
-                    <th>Résultat</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for test in tests %}
-                    <tr class="{% if test.est_meilleur %}test--meilleur{% endif %}">
-                        <th scope="row">
-                            #{{ test.numero }}
-                            {% if test.est_meilleur %}
-                                <span class="marque-meilleur" title="Meilleure combinaison">★</span>
-                            {% endif %}
-                        </th>
-                        <td>{{ test.date_test|date:"d/m/Y" }}</td>
-                        <td>{{ test.temperature_celsius }} °C</td>
-                        <td>{{ test.duree_lisible }}</td>
-                        <td class="{% if test.note == note_maximum %}note--haute{% endif %}">
-                            {% include 'plats/partiels/note.html' with note=test.note %}
-                        </td>
-                        <td>{{ test.commentaire|default:"-" }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="essais-entete">
+            <h3>Comparaison</h3>
+            <span class="text-muted">{{ tests|length }} essais côte à côte</span>
+        </div>
 
-        {% if plat.meilleur_test %}
+        <div class="comparaison-grille" style="--colonnes: {{ tests|length }}">
+            <span class="comparaison-attribut"></span>
+            {% for test in tests %}
+                <div class="cartouche {% if test.est_meilleur %}cartouche--retenu{% endif %}">
+                    <p class="kicker {% if test.est_meilleur %}kicker--accent{% endif %}">
+                        Essai n° {{ test.numero }}
+                        {% if test.est_meilleur %} · retenu{% endif %}
+                    </p>
+                    {% include "plats/partiels/combinaison.html" with test=test taille="carte" %}
+                    <p class="text-muted">{{ test.date_test|date:"d/m/Y" }}</p>
+                </div>
+            {% endfor %}
+
+            <span class="comparaison-attribut filet-bas">Note</span>
+            {% for test in tests %}
+                <div class="filet-bas {% if test.note == note_maximum %}note--haute{% endif %}">
+                    {% include "plats/partiels/note.html" with note=test.note %}
+                </div>
+            {% endfor %}
+
+            <span class="comparaison-attribut filet-bas">Commentaire</span>
+            {% for test in tests %}
+                <div class="filet-bas essai-commentaire">{{ test.commentaire|default:"—" }}</div>
+            {% endfor %}
+
+            {% if est_proprietaire %}
+                <span class="comparaison-attribut"></span>
+                {% for test in tests %}
+                    <div>
+                        {% if test.est_meilleur %}
+                            <span class="tag tag-accent">Déjà retenue</span>
+                        {% else %}
+                            <button
+                                type="button"
+                                class="btn {% if test.note == note_maximum %}btn-primary{% else %}btn-secondary{% endif %}"
+                                hx-post="{% url 'plats:definir_meilleur_test' test.pk %}"
+                                hx-target="#historique"
+                                hx-swap="outerHTML">
+                                Retenir cet essai
+                            </button>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {% if not plat.meilleur_test and est_proprietaire %}
             <p class="rappel">
-                Meilleure combinaison retenue pour ce plat :
-                {{ plat.meilleur_test.temperature_celsius }} °C /
-                {{ plat.meilleur_test.duree_lisible }}.
-            </p>
-        {% elif est_proprietaire %}
-            <p class="rappel">
-                Aucune meilleure combinaison n'est encore retenue. La note la mieux
-                placée est mise en évidence, mais le choix vous revient : utilisez le
-                bouton « Meilleure » dans l'historique.
+                La note la mieux placée est mise en évidence, mais le choix vous
+                revient : rien n'est retenu tant que vous ne l'avez pas dit.
             </p>
         {% endif %}
     {% endif %}
