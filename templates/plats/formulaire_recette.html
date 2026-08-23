@@ -25,7 +25,7 @@
                 {% for formulaire in jeux.ingredients %}
                     <div class="ligne-recette filet-bas">
                         {{ formulaire.id }}
-                        {% include "partials/formulaire.html" with formulaire=formulaire %}
+                        {% include "partiels/formulaire.html" with formulaire=formulaire %}
                     </div>
                 {% endfor %}
             </section>
@@ -37,7 +37,7 @@
                     <div class="ligne-recette ligne-recette--etape filet-bas">
                         <span class="numero">{{ forloop.counter|stringformat:"02d" }}</span>
                         {{ formulaire.id }}
-                        {% include "partials/formulaire.html" with formulaire=formulaire %}
+                        {% include "partiels/formulaire.html" with formulaire=formulaire %}
                     </div>
                 {% endfor %}
             </section>

@@ -55,11 +55,24 @@ uv run python manage.py donnees_demo
 |---|---|
 | `config/` | Réglages, urls racine, WSGI |
 | `users/` | Modèle Utilisateur, authentification par email, profil |
-| `plats/` | Plats, catégories, tests de cuisson, favoris, recettes |
-| `principal/` | Accueil, tableau de bord, gabarit de base |
-| `templates/` | Gabarits partagés et fragments HTMX |
-| `static/` | CSS, JavaScript, HTMX vendorisé |
+| `plats/` | Plats, catégories, essais de cuisson, favoris, recettes |
+| `principal/` | Accueil, tableau de bord |
+| `templates/` | Tous les gabarits, un sous-dossier par application |
+| `static/` | CSS, police Inter, HTMX vendorisé |
 | `medias/` | Fichiers envoyés par les utilisateurs (hors dépôt) |
+
+Les gabarits sont **centralisés à la racine** plutôt que dispersés dans chaque
+application : un seul endroit où chercher un écran.
+
+```text
+templates/
+├── base.html
+├── partiels/     # fragments partagés
+├── users/
+├── plats/
+│   └── partiels/ # fragments propres à l'application
+└── principal/
+```
 
 ## Déploiement (o2switch)
 

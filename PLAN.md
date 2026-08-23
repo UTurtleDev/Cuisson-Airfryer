@@ -41,9 +41,9 @@ plats/
 principal/
     views.py             # Accueil, TableauDeBord
     urls.py
-templates/
+templates/               # tous les gabarits, hors des applications
     base.html
-    partials/            # fragments HTMX
+    partiels/            # fragments partages
     users/  plats/  principal/
 static/
     css/  js/  vendor/htmx.min.js

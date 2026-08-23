@@ -55,10 +55,10 @@
                 <div class="airfryer-panier">
                     <form method="post">
                         {% csrf_token %}
-                        {% include "partials/formulaire.html" with formulaire=form champs_exclus="rester_connecte" %}
+                        {% include "partiels/formulaire.html" with formulaire=form champs_exclus="rester_connecte" %}
 
                         <div class="ligne-formulaire">
-                            {% include "partials/champ.html" with champ=form.rester_connecte %}
+                            {% include "partiels/champ.html" with champ=form.rester_connecte %}
                             <a href="{% url 'users:reinitialisation' %}">Mot de passe oublié&nbsp;?</a>
                         </div>
 

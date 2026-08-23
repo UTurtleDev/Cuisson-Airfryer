@@ -15,18 +15,18 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            {% include "partials/champ.html" with champ=form.nom %}
+            {% include "partiels/champ.html" with champ=form.nom %}
 
             <div class="deux-colonnes deux-colonnes--large">
-                {% include "partials/champ.html" with champ=form.categories %}
-                {% include "partials/champ.html" with champ=form.nombre_personnes %}
+                {% include "partiels/champ.html" with champ=form.categories %}
+                {% include "partiels/champ.html" with champ=form.nombre_personnes %}
             </div>
 
-            {% include "partials/champ.html" with champ=form.description %}
-            {% include "partials/champ.html" with champ=form.temps_preparation_minutes %}
-            {% include "partials/champ.html" with champ=form.image %}
+            {% include "partiels/champ.html" with champ=form.description %}
+            {% include "partiels/champ.html" with champ=form.temps_preparation_minutes %}
+            {% include "partiels/champ.html" with champ=form.image %}
             {% if form.ajouter_aux_favoris %}
-                {% include "partials/champ.html" with champ=form.ajouter_aux_favoris %}
+                {% include "partiels/champ.html" with champ=form.ajouter_aux_favoris %}
             {% endif %}
 
             <p class="actions">

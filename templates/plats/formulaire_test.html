@@ -23,14 +23,14 @@
             {% csrf_token %}
 
             <div class="deux-colonnes">
-                {% include "partials/champ.html" with champ=form.temperature_celsius %}
-                {% include "partials/champ.html" with champ=form.duree_minutes %}
+                {% include "partiels/champ.html" with champ=form.temperature_celsius %}
+                {% include "partiels/champ.html" with champ=form.duree_minutes %}
             </div>
 
-            {% include "partials/champ.html" with champ=form.date_test %}
-            {% include "partials/champ.html" with champ=form.note %}
-            {% include "partials/champ.html" with champ=form.commentaire %}
-            {% include "partials/champ.html" with champ=form.designer_comme_retenue %}
+            {% include "partiels/champ.html" with champ=form.date_test %}
+            {% include "partiels/champ.html" with champ=form.note %}
+            {% include "partiels/champ.html" with champ=form.commentaire %}
+            {% include "partiels/champ.html" with champ=form.designer_comme_retenue %}
 
             <p class="actions">
                 <button type="submit" class="btn btn-primary">Enregistrer l'essai</button>

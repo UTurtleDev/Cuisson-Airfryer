@@ -22,22 +22,22 @@
     </div>
 
     <div class="filtres-barre">
-        {% include "partials/champ.html" with champ=formulaire_filtres.q %}
-        {% include "partials/champ.html" with champ=formulaire_filtres.tri %}
-        {% include "partials/champ.html" with champ=formulaire_filtres.membre %}
+        {% include "partiels/champ.html" with champ=formulaire_filtres.q %}
+        {% include "partiels/champ.html" with champ=formulaire_filtres.tri %}
+        {% include "partiels/champ.html" with champ=formulaire_filtres.membre %}
     </div>
 
     <div class="filtres-detail">
-        {% include "partials/champ.html" with champ=formulaire_filtres.categories style="chips" %}
+        {% include "partiels/champ.html" with champ=formulaire_filtres.categories style="chips" %}
 
         <div class="deux-colonnes">
-            {% include "partials/champ.html" with champ=formulaire_filtres.duree_maximum %}
-            {% include "partials/champ.html" with champ=formulaire_filtres.preparation_maximum %}
+            {% include "partiels/champ.html" with champ=formulaire_filtres.duree_maximum %}
+            {% include "partiels/champ.html" with champ=formulaire_filtres.preparation_maximum %}
         </div>
 
         <div class="filtres-cases">
-            {% include "partials/champ.html" with champ=formulaire_filtres.avec_meilleure_combinaison %}
-            {% include "partials/champ.html" with champ=formulaire_filtres.favoris_uniquement %}
+            {% include "partiels/champ.html" with champ=formulaire_filtres.avec_meilleure_combinaison %}
+            {% include "partiels/champ.html" with champ=formulaire_filtres.favoris_uniquement %}
         </div>
     </div>
 

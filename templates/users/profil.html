@@ -9,7 +9,7 @@
 
         <form method="post">
             {% csrf_token %}
-            {% include "partials/formulaire.html" with formulaire=form %}
+            {% include "partiels/formulaire.html" with formulaire=form %}
             <p class="actions">
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
                 <a class="btn btn-ghost" href="{% url 'users:changement_mot_de_passe' %}">

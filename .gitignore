@@ -19,6 +19,9 @@ medias/
 # Variables d'environnement
 .env
 
+# Modeles de fichiers d'hebergement, importes d'un autre site
+exemple_fichiers_vps/
+
 # Aperçu local des pages rendues (outil de travail)
 .apercu/
 

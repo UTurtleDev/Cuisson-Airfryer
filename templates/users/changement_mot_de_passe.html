@@ -7,7 +7,7 @@
         <h1 class="titre-panneau">Changer mon mot de passe</h1>
         <form method="post">
             {% csrf_token %}
-            {% include "partials/formulaire.html" with formulaire=form %}
+            {% include "partiels/formulaire.html" with formulaire=form %}
             <p class="actions">
                 <button type="submit" class="btn btn-primary">Valider</button>
                 <a class="btn btn-ghost" href="{% url 'users:profil' %}">Annuler</a>

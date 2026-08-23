@@ -14,6 +14,6 @@
 
 {% for champ in formulaire.visible_fields %}
     {% if not champ|est_exclu:champs_exclus %}
-        {% include "partials/champ.html" %}
+        {% include "partiels/champ.html" %}
     {% endif %}
 {% endfor %}

@@ -81,6 +81,9 @@ URL_ADMINISTRATION = env("DJANGO_URL_ADMINISTRATION", default="admin/")
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
+        # Tous les gabarits du projet vivent dans templates/, avec un
+        # sous-dossier par application. APP_DIRS reste actif pour que
+        # l'administration de Django trouve les siens.
         "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
