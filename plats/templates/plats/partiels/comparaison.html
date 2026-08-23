@@ -33,7 +33,7 @@
                         <td>{{ test.temperature_celsius }} °C</td>
                         <td>{{ test.duree_lisible }}</td>
                         <td class="{% if test.note == note_maximum %}note--haute{% endif %}">
-                            {{ test.get_note_display }}
+                            {% include 'plats/partiels/note.html' with note=test.note %}
                         </td>
                         <td>{{ test.commentaire|default:"-" }}</td>
                     </tr>

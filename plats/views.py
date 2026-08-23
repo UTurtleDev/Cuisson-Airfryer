@@ -128,8 +128,11 @@ class CreerPlatView(DestinationApresEnregistrementMixin, LoginRequiredMixin, Cre
 
     def form_valid(self, formulaire):
         formulaire.instance.proprietaire = self.request.user
+        reponse = super().form_valid(formulaire)
+        if formulaire.cleaned_data.get("ajouter_aux_favoris"):
+            basculer_favori(self.object, self.request.user)
         messages.success(self.request, "Plat créé.")
-        return super().form_valid(formulaire)
+        return reponse
 
     def get_context_data(self, **kwargs):
         contexte = super().get_context_data(**kwargs)
@@ -165,6 +168,20 @@ class SupprimerPlatView(ProprietaireRequisMixin, DeleteView):
         return super().form_valid(formulaire)
 
 
+def appliquer_designation(formulaire, test):
+    """Applique la case « désigner comme combinaison retenue » du formulaire.
+
+    Décochée, elle retire la désignation si l'essai la portait : la case
+    reflète toujours l'état voulu, elle ne fait pas qu'ajouter.
+    """
+    demandee = formulaire.cleaned_data.get("designer_comme_retenue")
+    plat = test.plat
+    if demandee:
+        plat.definir_meilleur_test(test)
+    elif plat.meilleur_test_id == test.pk:
+        plat.definir_meilleur_test(None)
+
+
 class PlatDuMembreMixin(LoginRequiredMixin):
     """Récupère le plat de l'URL en exigeant qu'il appartienne au membre."""
 
@@ -189,13 +206,17 @@ class CreerTestView(PlatDuMembreMixin, CreateView):
 
     def form_valid(self, formulaire):
         formulaire.instance.plat = self.get_plat()
-        messages.success(self.request, "Test de cuisson enregistré.")
-        return super().form_valid(formulaire)
+        reponse = super().form_valid(formulaire)
+        appliquer_designation(formulaire, self.object)
+        messages.success(self.request, "Essai enregistré.")
+        return reponse
 
     def get_context_data(self, **kwargs):
         contexte = super().get_context_data(**kwargs)
-        contexte["plat"] = self.get_plat()
-        contexte["titre"] = f"Nouveau test - {self.get_plat().nom}"
+        plat = self.get_plat()
+        contexte["plat"] = plat
+        contexte["titre"] = f"Nouvel essai - {plat.nom}"
+        contexte["numero_de_l_essai"] = plat.tests.count() + 1
         return contexte
 
     def get_success_url(self):
@@ -208,13 +229,16 @@ class ModifierTestView(PlatProprietaireRequisMixin, UpdateView):
     template_name = "plats/formulaire_test.html"
 
     def form_valid(self, formulaire):
-        messages.success(self.request, "Test de cuisson modifié.")
-        return super().form_valid(formulaire)
+        reponse = super().form_valid(formulaire)
+        appliquer_designation(formulaire, self.object)
+        messages.success(self.request, "Essai modifié.")
+        return reponse
 
     def get_context_data(self, **kwargs):
         contexte = super().get_context_data(**kwargs)
         contexte["plat"] = self.object.plat
-        contexte["titre"] = f"Modifier un test - {self.object.plat.nom}"
+        contexte["titre"] = f"Modifier un essai - {self.object.plat.nom}"
+        contexte["numero_de_l_essai"] = self.object.numero
         return contexte
 
     def get_success_url(self):
@@ -233,7 +257,7 @@ class SupprimerTestView(PlatProprietaireRequisMixin, DeleteView):
     template_name = "plats/confirmer_suppression_test.html"
 
     def form_valid(self, formulaire):
-        messages.success(self.request, "Test de cuisson supprimé.")
+        messages.success(self.request, "Essai supprimé.")
         return super().form_valid(formulaire)
 
     def get_success_url(self):

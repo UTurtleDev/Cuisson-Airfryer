@@ -6,7 +6,7 @@
     <h1>Supprimer ce test ?</h1>
     <p>
         {{ test.date_test|date:"d/m/Y" }} : {{ test.temperature_celsius }} °C /
-        {{ test.duree_lisible }}, note {{ test.get_note_display }}.
+        {{ test.duree_lisible }}, {% include 'plats/partiels/note.html' with note=test.note %}
     </p>
     {% if test.est_meilleur %}
         <p>Ce test est la meilleure combinaison actuelle du plat. Après suppression,

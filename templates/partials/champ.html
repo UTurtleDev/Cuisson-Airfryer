@@ -9,6 +9,18 @@
         <label class="radio">
             {{ champ }}<span class="dot"></span>{{ champ.label }}
         </label>
+    {% elif champ|est_groupe_de_cases and style == "chips" %}
+        {% comment %}
+            Chips cliquables : une case à cocher masquée porte l'état, le
+            libellé porte le style. L'état sélectionné vient de
+            `:has(input:checked)`, sans JavaScript.
+        {% endcomment %}
+        <label>{{ champ.label }}</label>
+        <div class="chips-filtre">
+            {% for option in champ %}
+                <label class="chip">{{ option.tag }}{{ option.choice_label }}</label>
+            {% endfor %}
+        </div>
     {% elif champ|est_groupe_de_cases %}
         <label>{{ champ.label }}</label>
         <div class="groupe-cases">

@@ -185,3 +185,29 @@ class SelectionDepuisHistoriqueTest(TestCase):
             headers={"HX-Request": "true"},
         )
         self.assertNotContains(reponse, 'id="comparaison"')
+
+
+class NumeroIsoleTest(TestCase):
+    """Le numéro doit être juste même sur un essai manipulé seul."""
+
+    def setUp(self):
+        self.membre = creer_membre()
+        self.plat = creer_plat(self.membre)
+        self.premier = creer_test(self.plat, date_test=date(2026, 1, 10))
+        self.deuxieme = creer_test(self.plat, date_test=date(2026, 2, 10))
+        self.troisieme = creer_test(self.plat, date_test=date(2026, 3, 10))
+
+    def test_numero_calcule_a_la_demande(self):
+        from plats.models import TestCuisson
+
+        for attendu, essai in enumerate([self.premier, self.deuxieme, self.troisieme], 1):
+            with self.subTest(essai=attendu):
+                isole = TestCuisson.objects.get(pk=essai.pk)
+                self.assertEqual(isole.numero, attendu)
+
+    def test_coherent_avec_la_liste(self):
+        from plats.models import TestCuisson
+
+        for test in self.plat.tests_numerotes():
+            isole = TestCuisson.objects.get(pk=test.pk)
+            self.assertEqual(isole.numero, test.numero)

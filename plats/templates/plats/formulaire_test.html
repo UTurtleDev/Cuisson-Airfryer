@@ -3,11 +3,39 @@
 {% block titre %}{{ titre }} - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>{{ titre }}</h1>
-    <p><a href="{{ plat.get_absolute_url }}">Retour à {{ plat.nom }}</a></p>
-    <form method="post">
-        {% csrf_token %}
-        {% include "partials/formulaire.html" with formulaire=form %}
-        <button type="submit">Enregistrer le test</button>
-    </form>
+    <p class="lien-retour"><a href="{{ plat.get_absolute_url }}">← {{ plat.nom }}</a></p>
+
+    <div class="panneau">
+        <p class="kicker kicker--accent">
+            {{ plat.nom }} · essai n° {{ numero_de_l_essai }}
+        </p>
+        <h1 class="titre-panneau">Comment c'était&nbsp;?</h1>
+
+        {% if plat.meilleur_test %}
+            <p class="rappel">
+                Dernier réglage retenu :
+                {{ plat.meilleur_test.temperature_celsius }} °C /
+                {{ plat.meilleur_test.duree_minutes }} min.
+            </p>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="deux-colonnes">
+                {% include "partials/champ.html" with champ=form.temperature_celsius %}
+                {% include "partials/champ.html" with champ=form.duree_minutes %}
+            </div>
+
+            {% include "partials/champ.html" with champ=form.date_test %}
+            {% include "partials/champ.html" with champ=form.note %}
+            {% include "partials/champ.html" with champ=form.commentaire %}
+            {% include "partials/champ.html" with champ=form.designer_comme_retenue %}
+
+            <p class="actions">
+                <button type="submit" class="btn btn-primary">Enregistrer l'essai</button>
+                <a class="btn btn-ghost" href="{{ plat.get_absolute_url }}">Annuler</a>
+            </p>
+        </form>
+    </div>
 {% endblock %}

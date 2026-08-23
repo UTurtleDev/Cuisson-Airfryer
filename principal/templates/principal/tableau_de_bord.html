@@ -21,7 +21,7 @@
                     <li>
                         <a href="{{ test.plat.get_absolute_url }}">{{ test.plat.nom }}</a> :
                         {{ test.temperature_celsius }} °C / {{ test.duree_lisible }},
-                        {{ test.get_note_display }}
+                        {% include 'plats/partiels/note.html' with note=test.note %}
                         <span class="date">{{ test.date_test|date:"d/m/Y" }}</span>
                     </li>
                 {% endfor %}

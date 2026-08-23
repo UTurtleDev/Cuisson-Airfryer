@@ -52,6 +52,24 @@ class PlatQuerySet(models.QuerySet):
     def recents(self):
         return self.order_by("-date_creation")
 
+    def triee(self, critere):
+        """Ordre d'affichage de la liste des plats.
+
+        Par défaut, le plat dont l'essai est le plus récent arrive en tête :
+        c'est celui sur lequel la famille travaille en ce moment.
+        """
+        if critere == "note":
+            return self.avec_note_moyenne().order_by(
+                models.F("note_moyenne").desc(nulls_last=True), "-date_creation"
+            )
+        if critere == "nom":
+            return self.order_by("nom")
+        if critere == "essais":
+            return self.avec_note_moyenne().order_by("-nombre_tests", "-date_creation")
+        return self.annotate(dernier_essai=models.Max("tests__date_test")).order_by(
+            models.F("dernier_essai").desc(nulls_last=True), "-date_creation"
+        )
+
     def favoris_de(self, utilisateur):
         """Plats mis en favori par ce membre, du plus récemment ajouté."""
         if not utilisateur.is_authenticated:

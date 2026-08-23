@@ -166,7 +166,9 @@ class Plat(models.Model):
         tests = list(self.tests.all())
         total = len(tests)
         for rang, test in enumerate(tests):
-            test.numero = total - rang
+            # On pose le rang calculé en une passe plutôt que de laisser
+            # chaque essai l'interroger de son côté.
+            test.__dict__["numero"] = total - rang
 
         # La meilleure combinaison remonte en tête de liste, mais garde son
         # numéro : le numéro dit quand l'essai a été fait, pas son rang.
@@ -205,11 +207,18 @@ class TestCuisson(models.Model):
     """
 
     class Note(models.IntegerChoices):
-        UNE = 1, "★☆☆☆☆"
-        DEUX = 2, "★★☆☆☆"
-        TROIS = 3, "★★★☆☆"
-        QUATRE = 4, "★★★★☆"
-        CINQ = 5, "★★★★★"
+        """Note de 1 à 5.
+
+        Les libellés sont les chiffres eux-mêmes : c'est ce qu'affiche le
+        contrôle segmenté du design system. Les étoiles sont un rendu, pas
+        une valeur, et vivent dans le fragment `partiels/note.html`.
+        """
+
+        UNE = 1, "1"
+        DEUX = 2, "2"
+        TROIS = 3, "3"
+        QUATRE = 4, "4"
+        CINQ = 5, "5"
 
     plat = models.ForeignKey(
         Plat,
@@ -239,6 +248,19 @@ class TestCuisson(models.Model):
 
     def __str__(self):
         return f"{self.temperature_celsius} °C / {self.duree_minutes} min"
+
+    @property
+    def numero(self):
+        """Rang chronologique de cet essai parmi ceux du plat.
+
+        Défini comme attribut par `Plat.tests_numerotes()` pour les listes ;
+        cette propriété sert quand on manipule un essai isolé.
+        """
+        anterieurs = TestCuisson.objects.filter(plat_id=self.plat_id).filter(
+            models.Q(date_test__lt=self.date_test)
+            | models.Q(date_test=self.date_test, id__lte=self.pk)
+        )
+        return anterieurs.count()
 
     @property
     def est_meilleur(self):

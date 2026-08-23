@@ -864,3 +864,134 @@
 .liste-etapes li {
     margin-bottom: var(--space-2);
 }
+
+/* ── Panneaux de formulaire ───────────────────────────────────────────── */
+
+.titre-panneau {
+    font-size: 28px;
+    margin: var(--space-2) 0 var(--space-4);
+}
+
+.rappel {
+    font-size: 13px;
+    color: var(--color-neutral-500);
+    margin: 0 0 var(--space-8);
+    max-width: 52ch;
+    text-wrap: pretty;
+}
+
+.deux-colonnes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+}
+
+.deux-colonnes--large {
+    grid-template-columns: 1fr 160px;
+    align-items: start;
+}
+
+.deux-colonnes .field + .field,
+.deux-colonnes > .field {
+    margin-top: 0;
+}
+
+.deux-colonnes + .field {
+    margin-top: var(--space-6);
+}
+
+/* ── Barre de filtres ─────────────────────────────────────────────────── */
+
+.filtres {
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.filtres-barre {
+    display: grid;
+    grid-template-columns: 1fr 200px 200px;
+    gap: var(--space-6);
+}
+
+.filtres-barre .field {
+    margin-top: 0;
+}
+
+.filtres-detail {
+    margin-top: var(--space-6);
+}
+
+.filtres-cases {
+    display: flex;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+    margin-top: var(--space-6);
+}
+
+.filtres-cases .field {
+    margin-top: 0;
+}
+
+.filtres-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-8) 0 0;
+}
+
+@media (max-width: 767px) {
+    .filtres-barre,
+    .deux-colonnes,
+    .deux-colonnes--large {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+
+    .deux-colonnes > .field + .field {
+        margin-top: var(--space-4);
+    }
+}
+
+/* ── Chips de filtre ──────────────────────────────────────────────────── */
+
+.chips-filtre {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    padding: 5px 12px;
+    border-radius: calc(var(--radius-md) * 0.75);
+    background: var(--color-neutral-800);
+    color: var(--color-neutral-100);
+    cursor: pointer;
+}
+
+.chip input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.chip:hover {
+    background: var(--color-neutral-700);
+}
+
+.chip:has(input:checked) {
+    background: var(--color-accent-800);
+    color: var(--color-accent-100);
+}
+
+.chip:has(input:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}

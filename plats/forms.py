@@ -11,6 +11,11 @@ Utilisateur = get_user_model()
 class FormulairePlat(HabillageNocturneMixin, forms.ModelForm):
     """Création et modification d'un plat."""
 
+    ajouter_aux_favoris = forms.BooleanField(
+        label="Ajouter à mes favoris",
+        required=False,
+    )
+
     categories = forms.ModelMultipleChoiceField(
         label="catégories",
         queryset=Categorie.objects.filter(est_active=True),
@@ -40,6 +45,13 @@ class FormulairePlat(HabillageNocturneMixin, forms.ModelForm):
 class FormulaireTestCuisson(HabillageNocturneMixin, forms.ModelForm):
     """Enregistrement d'un essai de cuisson."""
 
+    designer_comme_retenue = forms.BooleanField(
+        label="Désigner comme combinaison retenue",
+        required=False,
+        initial=False,
+        help_text="La combinaison retenue reste un choix explicite.",
+    )
+
     class Meta:
         model = TestCuisson
         fields = ["temperature_celsius", "duree_minutes", "note", "commentaire", "date_test"]
@@ -48,10 +60,19 @@ class FormulaireTestCuisson(HabillageNocturneMixin, forms.ModelForm):
             "date_test": forms.DateInput(attrs={"type": "date"}),
             "temperature_celsius": forms.NumberInput(attrs={"min": 40, "max": 260, "step": 5}),
             "duree_minutes": forms.NumberInput(attrs={"min": 1, "max": 600}),
+            "note": forms.RadioSelect,
         }
         help_texts = {
             "commentaire": "Trop cuit, pas assez doré, parfait…",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Le segmenté n'a pas de case « aucune » : la note est obligatoire.
+        self.fields["note"].empty_label = None
+        self.fields["note"].choices = TestCuisson.Note.choices
+        if self.instance.pk and self.instance.est_meilleur:
+            self.fields["designer_comme_retenue"].initial = True
 
 
 class FormulaireFiltrePlats(HabillageNocturneMixin, forms.Form):
@@ -92,6 +113,16 @@ class FormulaireFiltrePlats(HabillageNocturneMixin, forms.Form):
         label="Avec une meilleure combinaison", required=False
     )
     favoris_uniquement = forms.BooleanField(label="Mes favoris", required=False)
+    tri = forms.ChoiceField(
+        label="Trier par",
+        required=False,
+        choices=[
+            ("", "Essai le plus récent"),
+            ("note", "Meilleure note"),
+            ("nom", "Nom du plat"),
+            ("essais", "Nombre d'essais"),
+        ],
+    )
 
     #: Valeur réservée pour « mes propres plats », les autres choix étant des pk.
     MOI = "moi"
@@ -143,7 +174,7 @@ class FormulaireFiltrePlats(HabillageNocturneMixin, forms.Form):
         if donnees.get("favoris_uniquement"):
             queryset = queryset.filter(favoris__utilisateur=utilisateur)
 
-        return queryset
+        return queryset.triee(donnees.get("tri"))
 
 
 class FormulaireIngredient(HabillageNocturneMixin, forms.ModelForm):

@@ -3,23 +3,39 @@
 {% block titre %}{{ titre }} - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>{{ titre }}</h1>
+    <div class="panneau">
+        <h1 class="titre-panneau">{{ titre }}</h1>
 
-    <p class="explication">
-        Un plat peut se limiter à ses essais de cuisson, comme des cordons bleus
-        sortis du congélateur où seuls la température et le temps comptent. Il peut
-        aussi porter une recette complète, avec ingrédients et étapes.
-    </p>
-
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% include "partials/formulaire.html" with formulaire=form %}
-
-        <p class="actions actions--enregistrement">
-            <button type="submit">Enregistrer</button>
-            <button type="submit" name="suite" value="recette">
-                Enregistrer puis écrire la recette
-            </button>
+        <p class="rappel">
+            Un plat peut se limiter à ses essais de cuisson, comme des cordons
+            bleus sortis du congélateur. Il peut aussi porter une recette
+            complète, avec ingrédients et étapes.
         </p>
-    </form>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% include "partials/champ.html" with champ=form.nom %}
+
+            <div class="deux-colonnes deux-colonnes--large">
+                {% include "partials/champ.html" with champ=form.categories %}
+                {% include "partials/champ.html" with champ=form.nombre_personnes %}
+            </div>
+
+            {% include "partials/champ.html" with champ=form.description %}
+            {% include "partials/champ.html" with champ=form.temps_preparation_minutes %}
+            {% include "partials/champ.html" with champ=form.image %}
+            {% if form.ajouter_aux_favoris %}
+                {% include "partials/champ.html" with champ=form.ajouter_aux_favoris %}
+            {% endif %}
+
+            <p class="actions">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="submit" name="suite" value="recette" class="btn btn-secondary">
+                    Enregistrer puis écrire la recette
+                </button>
+                <a class="btn btn-ghost" href="{% url 'plats:liste' %}">Annuler</a>
+            </p>
+        </form>
+    </div>
 {% endblock %}
