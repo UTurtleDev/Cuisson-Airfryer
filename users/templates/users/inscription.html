@@ -3,11 +3,21 @@
 {% block titre %}Inscription - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>Créer un compte</h1>
-    <form method="post">
-        {% csrf_token %}
-        {% include "partials/formulaire.html" with formulaire=form %}
-        <button type="submit">Créer mon compte</button>
-    </form>
-    <p>Déjà inscrit ? <a href="{% url 'users:connexion' %}">Se connecter</a></p>
+    <div class="panneau panneau--centre">
+        <p class="kicker kicker--accent">Airfryer · carnet de famille</p>
+        <h1 class="titre-panneau">Créer votre compte</h1>
+        <p class="rappel">
+            Le prénom et le nom sont facultatifs. Seule l'adresse e-mail sert
+            à vous connecter.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            {% include "partials/formulaire.html" with formulaire=form %}
+            <p class="actions">
+                <button type="submit" class="btn btn-primary">Créer mon compte</button>
+                <a class="btn btn-ghost" href="{% url 'users:connexion' %}">J'ai déjà un compte</a>
+            </p>
+        </form>
+    </div>
 {% endblock %}

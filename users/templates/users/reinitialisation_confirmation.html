@@ -3,16 +3,24 @@
 {% block titre %}Nouveau mot de passe{% endblock %}
 
 {% block contenu %}
-    {% if validlink %}
-        <h1>Choisir un nouveau mot de passe</h1>
-        <form method="post">
-            {% csrf_token %}
-            {% include "partials/formulaire.html" with formulaire=form %}
-            <button type="submit">Valider</button>
-        </form>
-    {% else %}
-        <h1>Lien invalide</h1>
-        <p>Ce lien de réinitialisation est invalide ou a déjà été utilisé.</p>
-        <p><a href="{% url 'users:reinitialisation' %}">Demander un nouveau lien</a></p>
-    {% endif %}
+    <div class="panneau panneau--centre">
+        {% if validlink %}
+            <h1 class="titre-panneau">Choisir un nouveau mot de passe</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% include "partials/formulaire.html" with formulaire=form %}
+                <p class="actions">
+                    <button type="submit" class="btn btn-primary">Valider</button>
+                </p>
+            </form>
+        {% else %}
+            <h1 class="titre-panneau">Lien invalide</h1>
+            <p class="rappel">Ce lien de réinitialisation est invalide ou a déjà été utilisé.</p>
+            <p class="actions">
+                <a class="btn btn-primary" href="{% url 'users:reinitialisation' %}">
+                    Demander un nouveau lien
+                </a>
+            </p>
+        {% endif %}
+    </div>
 {% endblock %}

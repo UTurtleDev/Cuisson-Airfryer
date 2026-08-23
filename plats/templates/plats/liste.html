@@ -14,6 +14,17 @@
         <a class="btn btn-primary" href="{% url 'plats:creer' %}">Ajouter un plat</a>
     </div>
 
+    {% comment %}
+        La case pilote l'ouverture de la feuille de filtres en mobile. En
+        desktop elle ne sert à rien : les filtres sont toujours visibles.
+        Une case cochée plutôt qu'un script, HTMX ne gérant pas l'affichage.
+    {% endcomment %}
+    <input type="checkbox" id="ouvrir-filtres" class="bascule-filtres visuellement-cache">
+
+    <div class="barre-mobile-filtres">
+        <label class="btn btn-secondary" for="ouvrir-filtres">Filtrer et rechercher</label>
+    </div>
+
     {% include "plats/partiels/filtres.html" %}
     {% include "plats/partiels/liste_plats.html" %}
 {% endblock %}

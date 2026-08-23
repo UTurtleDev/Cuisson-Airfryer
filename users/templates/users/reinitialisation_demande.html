@@ -3,11 +3,18 @@
 {% block titre %}Mot de passe oublié{% endblock %}
 
 {% block contenu %}
-    <h1>Mot de passe oublié</h1>
-    <p>Indiquez votre adresse électronique, un lien de réinitialisation vous sera envoyé.</p>
-    <form method="post">
-        {% csrf_token %}
-        {% include "partials/formulaire.html" with formulaire=form %}
-        <button type="submit">Envoyer le lien</button>
-    </form>
+    <div class="panneau panneau--centre">
+        <h1 class="titre-panneau">Mot de passe oublié</h1>
+        <p class="rappel">
+            Indiquez votre adresse e-mail, un lien de réinitialisation vous sera envoyé.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            {% include "partials/formulaire.html" with formulaire=form %}
+            <p class="actions">
+                <button type="submit" class="btn btn-primary">Envoyer le lien</button>
+                <a class="btn btn-ghost" href="{% url 'users:connexion' %}">Annuler</a>
+            </p>
+        </form>
+    </div>
 {% endblock %}

@@ -3,7 +3,13 @@
 {% block titre %}Mot de passe modifié{% endblock %}
 
 {% block contenu %}
-    <h1>Mot de passe modifié</h1>
-    <p>Votre mot de passe a bien été changé.</p>
-    <p><a href="{% url 'principal:tableau_de_bord' %}">Retour au tableau de bord</a></p>
+    <div class="panneau">
+        <h1 class="titre-panneau">Mot de passe modifié</h1>
+        <p class="rappel">Votre mot de passe a bien été changé.</p>
+        <p class="actions">
+            <a class="btn btn-primary" href="{% url 'principal:tableau_de_bord' %}">
+                Retour au carnet
+            </a>
+        </p>
+    </div>
 {% endblock %}

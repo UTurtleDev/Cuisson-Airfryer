@@ -1,12 +1,17 @@
 {% comment %}
     Recette du plat, adaptée au nombre de personnes demandé.
     Fragment renvoyé tel quel par HTMX quand on change le nombre de convives.
+
+    Aucun écran de référence dans le handoff : la mise en page reprend les
+    composants du système et le rythme des autres sections de la fiche.
 {% endcomment %}
 <section id="recette" class="recette">
     <div class="essais-entete">
         <h3>Recette</h3>
         {% if plat.a_une_recette %}
-            <span class="text-muted">pour {{ plat.nombre_personnes }} personnes</span>
+            <span class="text-muted">
+                écrite pour {{ plat.nombre_personnes }} personne{{ plat.nombre_personnes|pluralize }}
+            </span>
         {% endif %}
     </div>
 
@@ -19,52 +24,55 @@
             hx-target="#recette"
             hx-swap="outerHTML"
             hx-trigger="change, submit">
-            <label for="personnes-{{ plat.pk }}">Pour</label>
-            <input type="number" name="personnes" id="personnes-{{ plat.pk }}"
-                   value="{{ personnes }}" min="1" max="50">
-            <label for="personnes-{{ plat.pk }}">personnes</label>
-            <button type="submit">Adapter</button>
+            <label class="adaptation-libelle" for="personnes-{{ plat.pk }}">Adapter pour</label>
+            <input class="input adaptation-nombre" type="number" name="personnes"
+                   id="personnes-{{ plat.pk }}" value="{{ personnes }}" min="1" max="50">
+            <span class="adaptation-libelle">personnes</span>
+            <button type="submit" class="btn btn-secondary">Adapter</button>
             {% if quantites_adaptees %}
-                <span class="rappel">
-                    Recette écrite pour {{ plat.nombre_personnes }} personnes,
-                    quantités recalculées.
-                </span>
+                <span class="tag tag-outline">quantités recalculées</span>
             {% endif %}
         </form>
 
-        {% if ingredients %}
-            <h4 class="titre-section">Ingrédients</h4>
-            <ul class="liste-ingredients">
-                {% for ingredient in ingredients %}
-                    <li>{{ ingredient.libelle_adapte }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        <div class="recette-colonnes">
+            {% if ingredients %}
+                <section>
+                    <h4 class="titre-section">Ingrédients</h4>
+                    <ul class="liste-ingredients">
+                        {% for ingredient in ingredients %}
+                            <li>{{ ingredient.libelle_adapte }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
 
-        {% if etapes %}
-            <h4 class="titre-section">Préparation</h4>
-            <ol class="liste-etapes">
-                {% for etape in etapes %}
-                    <li>{{ etape.texte|linebreaksbr }}</li>
-                {% endfor %}
-            </ol>
-        {% endif %}
-    {% else %}
-        <p>Aucune recette n'est encore écrite pour ce plat.</p>
+            {% if etapes %}
+                <section>
+                    <h4 class="titre-section">Préparation</h4>
+                    <ol class="liste-etapes">
+                        {% for etape in etapes %}
+                            <li>{{ etape.texte|linebreaksbr }}</li>
+                        {% endfor %}
+                    </ol>
+                </section>
+            {% endif %}
+        </div>
+
         {% if est_proprietaire %}
             <p class="actions">
-                <a class="lien-action" href="{% url 'plats:modifier_recette' plat.slug %}">
+                <a class="btn btn-ghost" href="{% url 'plats:modifier_recette' plat.slug %}">
+                    Modifier la recette
+                </a>
+            </p>
+        {% endif %}
+    {% else %}
+        <p class="text-muted">Aucune recette n'est encore écrite pour ce plat.</p>
+        {% if est_proprietaire %}
+            <p class="actions">
+                <a class="btn btn-secondary" href="{% url 'plats:modifier_recette' plat.slug %}">
                     Ajouter une recette
                 </a>
             </p>
         {% endif %}
-    {% endif %}
-
-    {% if est_proprietaire and plat.a_une_recette %}
-        <p class="actions">
-            <a class="lien-action" href="{% url 'plats:modifier_recette' plat.slug %}">
-                Modifier la recette
-            </a>
-        </p>
     {% endif %}
 </section>

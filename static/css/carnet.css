@@ -1193,3 +1193,170 @@
     max-width: 620px;
     padding: 40px 0;
 }
+
+.panneau--centre {
+    margin-inline: auto;
+    padding-top: 40px;
+}
+
+/* ── Recette ──────────────────────────────────────────────────────────── */
+
+.recette-colonnes {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.adaptation {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-8);
+}
+
+.adaptation-libelle {
+    font-size: 13px;
+    color: var(--color-neutral-400);
+}
+
+.adaptation-nombre {
+    width: 5rem;
+}
+
+.panneau--large {
+    max-width: 820px;
+}
+
+.bloc-recette {
+    margin-bottom: 40px;
+}
+
+.ligne-recette {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) auto;
+    gap: var(--space-4);
+    align-items: end;
+    padding: var(--space-4) 0;
+}
+
+.ligne-recette .field {
+    margin-top: 0;
+}
+
+.ligne-recette--etape {
+    grid-template-columns: 40px 1fr;
+    align-items: start;
+}
+
+.ligne-recette--etape .numero {
+    padding-top: var(--space-6);
+}
+
+@media (max-width: 899px) {
+    .recette-colonnes {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+
+    .ligne-recette,
+    .ligne-recette--etape {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+
+    .ligne-recette--etape .numero {
+        padding-top: 0;
+    }
+}
+
+/* ── Feuille de filtres, écrans mobiles ───────────────────────────────── */
+
+/* En desktop, les filtres sont toujours là : la bascule et ses habillages
+   de feuille ne servent qu'en dessous du point de rupture. */
+.barre-mobile-filtres,
+.feuille-poignee,
+.feuille-entete,
+.feuille-valider {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .barre-mobile-filtres {
+        display: block;
+        margin-bottom: var(--space-6);
+    }
+
+    .barre-mobile-filtres .btn {
+        width: 100%;
+    }
+
+    .filtres {
+        position: fixed;
+        inset: auto 0 0 0;
+        z-index: 10;
+        max-height: 88vh;
+        overflow-y: auto;
+        margin: 0;
+        border: none;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        background: var(--color-surface);
+        box-shadow: var(--shadow-lg);
+        padding: var(--space-4) 22px calc(var(--space-8) + env(safe-area-inset-bottom));
+        transform: translateY(101%);
+        visibility: hidden;
+        transition: transform 200ms ease, visibility 200ms;
+    }
+
+    .bascule-filtres:checked ~ .filtres {
+        transform: none;
+        visibility: visible;
+    }
+
+    /* La liste s'atténue derrière la feuille ouverte. */
+    .bascule-filtres:checked ~ .resultats {
+        opacity: 0.35;
+    }
+
+    .feuille-poignee {
+        display: block;
+        width: 38px;
+        height: 3px;
+        border-radius: 2px;
+        margin: 0 auto var(--space-6);
+        background: var(--color-neutral-700);
+        cursor: pointer;
+    }
+
+    .feuille-entete {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: var(--space-6);
+    }
+
+    .feuille-titre {
+        font-family: var(--font-heading);
+        font-size: 20px;
+    }
+
+    .feuille-valider {
+        display: inline-flex;
+        width: 100%;
+    }
+
+    .filtres-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtres-actions .btn-secondary,
+    .filtres-effacer {
+        display: none;
+    }
+
+    .onglets {
+        z-index: 5;
+    }
+}

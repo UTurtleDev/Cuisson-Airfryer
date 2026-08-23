@@ -3,7 +3,11 @@
 {% block titre %}Mot de passe réinitialisé{% endblock %}
 
 {% block contenu %}
-    <h1>Mot de passe réinitialisé</h1>
-    <p>Votre mot de passe a été mis à jour.</p>
-    <p><a href="{% url 'users:connexion' %}">Se connecter</a></p>
+    <div class="panneau panneau--centre">
+        <h1 class="titre-panneau">Mot de passe réinitialisé</h1>
+        <p class="rappel">Votre mot de passe a été mis à jour.</p>
+        <p class="actions">
+            <a class="btn btn-primary" href="{% url 'users:connexion' %}">Se connecter</a>
+        </p>
+    </div>
 {% endblock %}

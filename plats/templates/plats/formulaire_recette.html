@@ -3,43 +3,49 @@
 {% block titre %}Recette - {{ plat.nom }}{% endblock %}
 
 {% block contenu %}
-    <h1>Recette de {{ plat.nom }}</h1>
-    <p>
-        Quantités données pour {{ plat.nombre_personnes }} personnes.
-        <a href="{% url 'plats:modifier' plat.slug %}">Changer ce nombre</a>.
-    </p>
-    <p><a href="{{ plat.get_absolute_url }}">Retour au plat</a></p>
+    <p class="lien-retour"><a href="{{ plat.get_absolute_url }}">← {{ plat.nom }}</a></p>
 
-    <form method="post">
-        {% csrf_token %}
-
-        <fieldset>
-            <legend>Ingrédients</legend>
-            {{ jeux.ingredients.management_form }}
-            {% for formulaire in jeux.ingredients %}
-                <div class="ligne-recette">
-                    {{ formulaire.id }}
-                    {% include "partials/formulaire.html" with formulaire=formulaire %}
-                </div>
-            {% endfor %}
-        </fieldset>
-
-        <fieldset>
-            <legend>Étapes de préparation</legend>
-            {{ jeux.etapes.management_form }}
-            {% for formulaire in jeux.etapes %}
-                <div class="ligne-recette">
-                    {{ formulaire.id }}
-                    {% include "partials/formulaire.html" with formulaire=formulaire %}
-                </div>
-            {% endfor %}
-        </fieldset>
-
-        <p class="explication">
-            Les lignes vides sont ignorées et l'ordre d'affichage suit l'ordre des
-            lignes ci-dessus. S'il vous manque des lignes, enregistrez puis revenez
-            sur cette page : de nouvelles lignes vides vous attendront.
+    <div class="panneau panneau--large">
+        <p class="kicker kicker--accent">{{ plat.nom }}</p>
+        <h1 class="titre-panneau">La recette</h1>
+        <p class="rappel">
+            Quantités données pour {{ plat.nombre_personnes }} personne{{ plat.nombre_personnes|pluralize }},
+            <a href="{% url 'plats:modifier' plat.slug %}">modifiable sur la fiche du plat</a>.
+            Les lignes vides sont ignorées et l'ordre d'affichage suit celui des lignes.
+            S'il vous manque des lignes, enregistrez puis revenez : de nouvelles
+            lignes vides vous attendront.
         </p>
-        <button type="submit">Enregistrer la recette</button>
-    </form>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <section class="bloc-recette">
+                <h3 class="titre-statistique">Ingrédients</h3>
+                {{ jeux.ingredients.management_form }}
+                {% for formulaire in jeux.ingredients %}
+                    <div class="ligne-recette filet-bas">
+                        {{ formulaire.id }}
+                        {% include "partials/formulaire.html" with formulaire=formulaire %}
+                    </div>
+                {% endfor %}
+            </section>
+
+            <section class="bloc-recette">
+                <h3 class="titre-statistique">Étapes de préparation</h3>
+                {{ jeux.etapes.management_form }}
+                {% for formulaire in jeux.etapes %}
+                    <div class="ligne-recette ligne-recette--etape filet-bas">
+                        <span class="numero">{{ forloop.counter|stringformat:"02d" }}</span>
+                        {{ formulaire.id }}
+                        {% include "partials/formulaire.html" with formulaire=formulaire %}
+                    </div>
+                {% endfor %}
+            </section>
+
+            <p class="actions">
+                <button type="submit" class="btn btn-primary">Enregistrer la recette</button>
+                <a class="btn btn-ghost" href="{{ plat.get_absolute_url }}">Annuler</a>
+            </p>
+        </form>
+    </div>
 {% endblock %}

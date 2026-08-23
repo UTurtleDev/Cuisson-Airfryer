@@ -14,6 +14,13 @@
     hx-indicator="#indicateur-recherche"
     hx-trigger="input changed delay:300ms from:input[type=text], input changed delay:500ms from:input[type=number], change, submit">
 
+    <label class="feuille-poignee" for="ouvrir-filtres" aria-hidden="true"></label>
+
+    <div class="feuille-entete">
+        <span class="feuille-titre">Filtrer</span>
+        <a href="{% url 'plats:liste' %}">Tout effacer</a>
+    </div>
+
     <div class="filtres-barre">
         {% include "partials/champ.html" with champ=formulaire_filtres.q %}
         {% include "partials/champ.html" with champ=formulaire_filtres.tri %}
@@ -36,7 +43,12 @@
 
     <p class="filtres-actions">
         <button type="submit" class="btn btn-secondary">Filtrer</button>
-        <a class="btn btn-ghost" href="{% url 'plats:liste' %}">Tout effacer</a>
+        <a class="btn btn-ghost filtres-effacer" href="{% url 'plats:liste' %}">Tout effacer</a>
         <span id="indicateur-recherche" class="htmx-indicator">Recherche…</span>
+        {% comment %}
+            Un vrai bouton d'envoi, pas une étiquette de fermeture : sans
+            HTMX, la feuille doit tout de même appliquer les filtres.
+        {% endcomment %}
+        <button type="submit" class="btn btn-primary feuille-valider">Voir les plats</button>
     </p>
 </form>
