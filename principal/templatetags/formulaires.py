@@ -24,13 +24,17 @@ def est_groupe_radio(champ):
     return isinstance(champ.field.widget, forms.RadioSelect)
 
 
-@register.filter
-def est_exclu(champ, noms):
-    """Vrai si le champ figure dans la liste de noms séparés par des virgules.
+@register.simple_tag(takes_context=True)
+def champ_exclu(context, champ):
+    """Vrai si le champ figure dans la variable de contexte `champs_exclus`.
+
+    Balise plutôt que filtre : une variable de contexte absente passée en
+    argument de filtre fait échouer toute la condition qui l'entoure, et
+    le formulaire se rend alors vide, sans la moindre erreur.
 
     On compare des noms entiers : sans cela, exclure « note » écarterait
     aussi « notes » par simple sous-chaîne.
     """
-    if not noms:
-        return False
-    return champ.name in [nom.strip() for nom in noms.split(",")]
+    noms = context.get("champs_exclus") or ""
+    return champ.name in [nom.strip() for nom in str(noms).split(",")]
+

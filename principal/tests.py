@@ -163,3 +163,71 @@ class PagesRendueTest(TestCase):
                 self.assertNotIn("{#", contenu)
                 self.assertNotIn("{%", contenu)
                 self.assertNotIn("{{", contenu)
+
+
+class FormulairesRendusTest(TestCase):
+    """Chaque champ d'un formulaire doit arriver dans le HTML envoyé.
+
+    Un gabarit peut se rendre vide sans lever d'erreur : la page répond 200,
+    la vue a le bon contexte, et pourtant l'utilisateur n'a aucun champ à
+    remplir. Vérifier le code de statut ne suffit donc pas.
+    """
+
+    def setUp(self):
+        self.membre = creer_membre()
+        self.plat = creer_plat(self.membre, nom="Hamburger")
+        creer_test(self.plat)
+
+    def pages_avec_formulaire(self):
+        return [
+            reverse("users:inscription"),
+            reverse("users:profil"),
+            reverse("users:changement_mot_de_passe"),
+            reverse("users:reinitialisation"),
+            reverse("plats:creer"),
+            reverse("plats:modifier", args=[self.plat.slug]),
+            reverse("plats:creer_test", args=[self.plat.slug]),
+            reverse("plats:modifier_test", args=[self.plat.tests.first().pk]),
+            reverse("plats:liste"),
+        ]
+
+    def verifier_les_champs(self, url):
+        reponse = self.client.get(url)
+        self.assertEqual(reponse.status_code, 200, f"{url} ne rend pas de page")
+        contenu = reponse.content.decode()
+        formulaires = []
+        for cle in ("form", "formulaire_filtres"):
+            try:
+                valeur = reponse.context[cle]
+            except KeyError:
+                continue
+            if hasattr(valeur, "visible_fields"):
+                formulaires.append(valeur)
+        self.assertTrue(formulaires, f"aucun formulaire dans le contexte de {url}")
+        for formulaire in formulaires:
+            for champ in formulaire.visible_fields():
+                with self.subTest(url=url, champ=champ.name):
+                    self.assertIn(f'name="{champ.html_name}"', contenu)
+
+    def test_connexion(self):
+        """La connexion redirige un membre déjà connecté : on la teste seule."""
+        self.verifier_les_champs(reverse("users:connexion"))
+
+    def test_tous_les_champs_sont_rendus(self):
+        self.client.force_login(self.membre)
+        for url in self.pages_avec_formulaire():
+            self.verifier_les_champs(url)
+    def test_champs_de_la_recette_rendus(self):
+        self.client.force_login(self.membre)
+        url = reverse("plats:modifier_recette", args=[self.plat.slug])
+        contenu = self.client.get(url).content.decode()
+        for nom in ["ingredients-0-nom", "ingredients-0-quantite", "ingredients-0-unite"]:
+            with self.subTest(champ=nom):
+                self.assertIn(f'name="{nom}"', contenu)
+        self.assertIn('name="etapes-0-texte"', contenu)
+
+    def test_champ_exclu_reste_exclu(self):
+        """La connexion place « rester connecté » à la main, hors de la boucle."""
+        self.client.logout()
+        contenu = self.client.get(reverse("users:connexion")).content.decode()
+        self.assertEqual(contenu.count('name="rester_connecte"'), 1)

@@ -13,7 +13,8 @@
 {% endif %}
 
 {% for champ in formulaire.visible_fields %}
-    {% if not champ|est_exclu:champs_exclus %}
+    {% champ_exclu champ as exclu %}
+    {% if not exclu %}
         {% include "partiels/champ.html" %}
     {% endif %}
 {% endfor %}
