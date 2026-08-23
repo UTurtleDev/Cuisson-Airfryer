@@ -3,12 +3,81 @@
 {% block titre %}Connexion - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>Connexion</h1>
-    <form method="post">
-        {% csrf_token %}
-        {% include "partials/formulaire.html" with formulaire=form %}
-        <button type="submit">Se connecter</button>
-    </form>
-    <p><a href="{% url 'users:reinitialisation' %}">Mot de passe oublié ?</a></p>
-    <p>Pas encore de compte ? <a href="{% url 'users:inscription' %}">S'inscrire</a></p>
+    <div class="accueil-connexion">
+
+        <div class="accueil-argument">
+            <p class="kicker kicker--accent">Airfryer · carnet de famille</p>
+            <h1 class="titre-accroche">Le bon réglage, noté une fois pour toutes.</h1>
+            <p class="accroche">
+                Chaque essai garde sa température, sa durée et ce qu'on en a pensé.
+                La combinaison retenue reste en tête de fiche, plus personne ne redevine.
+            </p>
+            <div class="chiffres">
+                <div class="chiffre">
+                    <div class="chiffre-valeur">{{ nombre_de_plats }}</div>
+                    <div class="kicker">plat{{ nombre_de_plats|pluralize }}</div>
+                </div>
+                <div class="chiffre">
+                    <div class="chiffre-valeur">{{ nombre_d_essais }}</div>
+                    <div class="kicker">essai{{ nombre_d_essais|pluralize }}</div>
+                </div>
+                <div class="chiffre">
+                    <div class="chiffre-valeur chiffre-valeur--accent">{{ nombre_au_point }}</div>
+                    <div class="kicker">au point</div>
+                </div>
+            </div>
+        </div>
+
+        {% comment %}
+            L'appareil : le formulaire est posé dans le panier de l'airfryer.
+            Décoratif, donc masqué aux lecteurs d'écran hormis le formulaire.
+        {% endcomment %}
+        <div class="airfryer">
+            <span class="airfryer-poignee" aria-hidden="true"></span>
+
+            <div class="airfryer-coque">
+                <div class="airfryer-bandeau">
+                    <div class="airfryer-molette" aria-hidden="true">
+                        <span class="airfryer-molette-valeur">190</span>
+                        <span class="airfryer-molette-repere"></span>
+                    </div>
+                    <div>
+                        <div class="airfryer-titre">Bienvenue</div>
+                        <div class="airfryer-sous-titre">Connectez-vous pour ouvrir le carnet</div>
+                    </div>
+                    <div class="airfryer-voyants" aria-hidden="true">
+                        <span class="voyant voyant--allume"></span>
+                        <span class="voyant"></span>
+                        <span class="voyant"></span>
+                    </div>
+                </div>
+
+                <div class="airfryer-panier">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% include "partials/formulaire.html" with formulaire=form champs_exclus="rester_connecte" %}
+
+                        <div class="ligne-formulaire">
+                            {% include "partials/champ.html" with champ=form.rester_connecte %}
+                            <a href="{% url 'users:reinitialisation' %}">Mot de passe oublié&nbsp;?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">
+                            Ouvrir le carnet
+                        </button>
+
+                        <p class="lien-inscription">
+                            Pas encore de compte&nbsp;?
+                            <a href="{% url 'users:inscription' %}">Créer le vôtre</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="airfryer-pieds" aria-hidden="true">
+                <span></span><span></span>
+            </div>
+        </div>
+
+    </div>
 {% endblock %}

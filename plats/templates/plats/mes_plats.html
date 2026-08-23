@@ -3,7 +3,13 @@
 {% block titre %}Mes plats - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>Mes plats</h1>
-    <p><a href="{% url 'plats:creer' %}">Ajouter un plat</a></p>
+    <div class="entete-page">
+        <div>
+            <h1>Mes plats</h1>
+            <p class="sous-titre">Les plats dont vous êtes l'auteur.</p>
+        </div>
+        <a class="btn btn-primary" href="{% url 'plats:creer' %}">Ajouter un plat</a>
+    </div>
+
     {% include "plats/partiels/liste_plats.html" %}
 {% endblock %}

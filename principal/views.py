@@ -36,6 +36,7 @@ class TableauDeBordView(LoginRequiredMixin, TemplateView):
     """Point d'entrée de l'utilisateur connecté."""
 
     template_name = "principal/tableau_de_bord.html"
+    extra_context = {"rubrique": "tableau_de_bord"}
 
     def get_context_data(self, **kwargs):
         contexte = super().get_context_data(**kwargs)

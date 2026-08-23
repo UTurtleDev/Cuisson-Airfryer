@@ -4,35 +4,47 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block titre %}Carnet de cuisson{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/inter.css' %}">
+    <link rel="stylesheet" href="{% static 'css/nocturne.css' %}">
+    <link rel="stylesheet" href="{% static 'css/carnet.css' %}">
     <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
     {% block entete_supplementaire %}{% endblock %}
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
+<div class="page">
+
     <header class="entete">
-        <a class="logo" href="{% url 'principal:accueil' %}">Carnet de cuisson</a>
-        <nav class="navigation">
-            {% block navigation %}
-                {% if user.is_authenticated %}
-                    <a href="{% url 'plats:liste' %}">Les plats</a>
-                    <a href="{% url 'plats:mes_plats' %}">Mes plats</a>
-                    <a href="{% url 'plats:favoris' %}">Mes favoris</a>
-                    <a href="{% url 'principal:tableau_de_bord' %}">Tableau de bord</a>
-                    <a href="{% url 'users:profil' %}">{{ user.nom_affiche }}</a>
-                    <form method="post" action="{% url 'users:deconnexion' %}">
-                        {% csrf_token %}
-                        <button type="submit">Se déconnecter</button>
-                    </form>
+        <a class="entete-marque" href="{% url 'principal:accueil' %}">Carnet de cuisson</a>
+
+        {% if user.is_authenticated %}
+            <nav class="navigation">
+                <a href="{% url 'plats:liste' %}"
+                   class="{% if rubrique == 'plats' %}est-actif{% endif %}">Les plats</a>
+                <a href="{% url 'plats:mes_plats' %}"
+                   class="{% if rubrique == 'mes_plats' %}est-actif{% endif %}">Mes plats</a>
+                <a href="{% url 'plats:favoris' %}"
+                   class="{% if rubrique == 'favoris' %}est-actif{% endif %}">Mes favoris</a>
+                <a href="{% url 'principal:tableau_de_bord' %}"
+                   class="{% if rubrique == 'tableau_de_bord' %}est-actif{% endif %}">Tableau de bord</a>
+                <span class="navigation-separateur"></span>
+                <a href="{% url 'users:profil' %}">{{ user.nom_affiche }}</a>
+                <form method="post" action="{% url 'users:deconnexion' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">Se déconnecter</button>
+                </form>
+            </nav>
+        {% else %}
+            <nav class="navigation">
+                {% if rubrique == "inscription" %}
+                    <a href="{% url 'users:connexion' %}">Se connecter</a>
                 {% else %}
-                    <a href="{% url 'users:connexion' %}">Connexion</a>
-                    <a href="{% url 'users:inscription' %}">Inscription</a>
+                    <a href="{% url 'users:inscription' %}">Créer un compte</a>
                 {% endif %}
-            {% endblock %}
-        </nav>
+            </nav>
+        {% endif %}
     </header>
 
-    {# Zone de messages, rafraîchissable hors bande par les réponses HTMX #}
     <div id="messages" class="messages">
         {% include "partials/messages.html" %}
     </div>
@@ -45,6 +57,19 @@
         <p>Carnet de cuisson familial</p>
     </footer>
 
-    {% block scripts %}{% endblock %}
+</div>
+
+{% if user.is_authenticated %}
+    <nav class="onglets">
+        <a href="{% url 'plats:liste' %}"
+           class="{% if rubrique == 'plats' %}est-actif{% endif %}">Les plats</a>
+        <a href="{% url 'plats:favoris' %}"
+           class="{% if rubrique == 'favoris' %}est-actif{% endif %}">Favoris</a>
+        <a href="{% url 'principal:tableau_de_bord' %}"
+           class="{% if rubrique == 'tableau_de_bord' %}est-actif{% endif %}">Chiffres</a>
+    </nav>
+{% endif %}
+
+{% block scripts %}{% endblock %}
 </body>
 </html>

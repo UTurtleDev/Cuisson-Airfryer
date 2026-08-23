@@ -1,10 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, BaseUserCreationForm
 
+from principal.formulaires import HabillageNocturneMixin
 from users.models import Utilisateur
 
 
-class FormulaireInscription(BaseUserCreationForm):
+class FormulaireInscription(HabillageNocturneMixin, BaseUserCreationForm):
     """Inscription d'un nouveau membre de la famille."""
 
     class Meta:
@@ -18,12 +19,24 @@ class FormulaireInscription(BaseUserCreationForm):
         self.fields["nom"].help_text = "Facultatif."
 
 
-class FormulaireConnexion(AuthenticationForm):
+class FormulaireConnexion(HabillageNocturneMixin, AuthenticationForm):
     """Connexion par adresse électronique."""
 
     username = forms.EmailField(
-        label="Adresse électronique",
-        widget=forms.EmailInput(attrs={"autofocus": True, "autocomplete": "email"}),
+        label="Adresse e-mail",
+        widget=forms.EmailInput(
+            attrs={
+                "autofocus": True,
+                "autocomplete": "email",
+                "placeholder": "sebastien@martin.fr",
+            }
+        ),
+    )
+
+    rester_connecte = forms.BooleanField(
+        label="Rester connecté",
+        required=False,
+        initial=True,
     )
 
     error_messages = {
@@ -33,7 +46,7 @@ class FormulaireConnexion(AuthenticationForm):
     }
 
 
-class FormulaireProfil(forms.ModelForm):
+class FormulaireProfil(HabillageNocturneMixin, forms.ModelForm):
     """Modification des informations personnelles."""
 
     class Meta:

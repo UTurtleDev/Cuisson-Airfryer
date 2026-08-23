@@ -1,35 +1,34 @@
-{# Fragment renvoyé par HTMX lors de la recherche et des filtres. #}
+{% comment %}Fragment renvoyé par HTMX lors de la recherche et des filtres.{% endcomment %}
 <div id="resultats" class="resultats">
     {% with nombre=page_obj.paginator.count %}
-        <p class="nombre-resultats">
+        <p class="kicker">
             {{ nombre }} plat{% if nombre > 1 %}s{% endif %}
         </p>
     {% endwith %}
 
-    <div class="grille-plats">
+    {% if plats %}
+        <div class="registre-entete filet-bas">
+            <span>N°</span><span>Plat</span><span>Combinaison retenue</span><span>Note</span>
+        </div>
         {% for plat in plats %}
-            {% include "plats/partiels/carte_plat.html" %}
-        {% empty %}
-            <p>Aucun plat ne correspond à cette recherche.</p>
+            {% include "plats/partiels/ligne_registre.html" %}
         {% endfor %}
-    </div>
+    {% else %}
+        <p class="text-muted">Aucun plat ne correspond à cette recherche.</p>
+    {% endif %}
 
     {% if is_paginated %}
         <nav class="pagination">
             {% if page_obj.has_previous %}
-                <a href="{% querystring page=page_obj.previous_page_number %}"
+                <a class="btn btn-ghost" href="{% querystring page=page_obj.previous_page_number %}"
                    hx-get="{% querystring page=page_obj.previous_page_number %}"
-                   hx-target="#resultats"
-                   hx-swap="outerHTML"
-                   hx-push-url="true">Précédent</a>
+                   hx-target="#resultats" hx-swap="outerHTML" hx-push-url="true">Précédent</a>
             {% endif %}
-            <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+            <span class="text-muted">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
             {% if page_obj.has_next %}
-                <a href="{% querystring page=page_obj.next_page_number %}"
+                <a class="btn btn-ghost" href="{% querystring page=page_obj.next_page_number %}"
                    hx-get="{% querystring page=page_obj.next_page_number %}"
-                   hx-target="#resultats"
-                   hx-swap="outerHTML"
-                   hx-push-url="true">Suivant</a>
+                   hx-target="#resultats" hx-swap="outerHTML" hx-push-url="true">Suivant</a>
             {% endif %}
         </nav>
     {% endif %}

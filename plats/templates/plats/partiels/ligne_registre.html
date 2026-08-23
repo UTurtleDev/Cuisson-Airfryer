@@ -1,0 +1,42 @@
+{% comment %}
+    Une ligne du registre. La combinaison retenue est mise en avant ; un plat
+    encore à régler montre son dernier réglage en gris, avec un appel à
+    désigner.
+{% endcomment %}
+<div class="registre-ligne filet-bas">
+    <span class="numero{% if plat.meilleur_test %} numero--retenu{% endif %}">
+        {{ forloop.counter|stringformat:"02d" }}
+    </span>
+
+    <div>
+        <div class="plat-nom"><a href="{{ plat.get_absolute_url }}">{{ plat.nom }}</a></div>
+        <div class="plat-meta">
+            {{ plat.proprietaire.nom_affiche }}
+            {% for categorie in plat.categories.all %} · {{ categorie.nom }}{% endfor %}
+            · {{ plat.nombre_personnes }} pers.
+        </div>
+    </div>
+
+    <div>
+        {% if plat.meilleur_test %}
+            {% include "plats/partiels/combinaison.html" with test=plat.meilleur_test taille="ligne" %}
+        {% elif plat.dernier_temperature %}
+            <div class="combinaison combinaison--ligne combinaison--a-regler">
+                {{ plat.dernier_temperature }}<span class="combinaison-unite">°C</span>
+                <span class="combinaison-separateur">/</span>
+                {{ plat.dernier_duree }}<span class="combinaison-unite">min</span>
+            </div>
+            <a class="a-designer" href="{{ plat.get_absolute_url }}">À désigner</a>
+        {% else %}
+            <span class="text-muted">Aucun essai</span>
+        {% endif %}
+    </div>
+
+    <div>
+        {% if plat.meilleur_test %}
+            {% include "plats/partiels/note.html" with note=plat.meilleur_test.note %}
+        {% elif plat.dernier_note %}
+            {% include "plats/partiels/note.html" with note=plat.dernier_note %}
+        {% endif %}
+    </div>
+</div>

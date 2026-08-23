@@ -15,6 +15,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
 from users.forms import FormulaireConnexion, FormulaireInscription, FormulaireProfil
+from plats.models import Plat, TestCuisson
 from users.models import Utilisateur
 
 
@@ -24,6 +25,7 @@ class InscriptionView(CreateView):
     model = Utilisateur
     form_class = FormulaireInscription
     template_name = "users/inscription.html"
+    extra_context = {"rubrique": "inscription"}
     success_url = reverse_lazy("principal:tableau_de_bord")
 
     def form_valid(self, formulaire):
@@ -37,6 +39,21 @@ class ConnexionView(LoginView):
     template_name = "users/connexion.html"
     authentication_form = FormulaireConnexion
     redirect_authenticated_user = True
+
+    def form_valid(self, formulaire):
+        reponse = super().form_valid(formulaire)
+        # Sans « rester connecté », la session tombe à la fermeture du
+        # navigateur : utile sur un ordinateur partagé en famille.
+        if not formulaire.cleaned_data.get("rester_connecte"):
+            self.request.session.set_expiry(0)
+        return reponse
+
+    def get_context_data(self, **kwargs):
+        contexte = super().get_context_data(**kwargs)
+        contexte["nombre_de_plats"] = Plat.objects.count()
+        contexte["nombre_d_essais"] = TestCuisson.objects.count()
+        contexte["nombre_au_point"] = Plat.objects.avec_meilleur_test().count()
+        return contexte
 
 
 class DeconnexionView(LogoutView):

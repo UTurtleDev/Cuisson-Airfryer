@@ -1,0 +1,613 @@
+/*
+   Styles propres au carnet de cuisson.
+
+   Toutes les valeurs viennent des tokens de nocturne.css : aucun hex, aucune
+   police, aucune taille codée en dur là où un token existe. Ce fichier ne
+   contient que ce que le design system ne fournit pas : la mise en page des
+   écrans et le vocabulaire visuel du produit (la combinaison en gros
+   caractères, les filets estompés, la numérotation en marge).
+*/
+
+/* ── Ossature ─────────────────────────────────────────────────────────── */
+
+.page {
+    max-width: 1180px;
+    margin-inline: auto;
+}
+
+.entete {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 14px 40px;
+}
+
+.entete-marque {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 18px;
+    margin-right: auto;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.navigation a {
+    font-size: 14px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.navigation a.est-actif {
+    color: var(--color-accent);
+}
+
+.navigation-separateur {
+    width: 1px;
+    height: 18px;
+    background: var(--color-divider);
+}
+
+.contenu {
+    padding: 40px 40px 64px;
+}
+
+.pied-de-page {
+    padding: 0 40px 40px;
+    font-size: 12px;
+    color: var(--color-neutral-500);
+}
+
+/* ── Filets estompés ──────────────────────────────────────────────────── */
+
+.filet-bas {
+    background: linear-gradient(to right,
+        transparent, var(--color-divider) 48px,
+        var(--color-divider) calc(100% - 48px), transparent)
+        no-repeat bottom / 100% 1px;
+}
+
+/* ── Titres et kickers ────────────────────────────────────────────────── */
+
+.entete-page {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 26px;
+}
+
+.kicker {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-neutral-500);
+}
+
+.kicker--accent {
+    color: var(--color-accent);
+}
+
+.sous-titre {
+    font-size: 15px;
+    color: var(--color-neutral-400);
+    margin: 0;
+    max-width: 560px;
+    text-wrap: pretty;
+}
+
+/* ── La combinaison retenue, en gros caractères ───────────────────────── */
+
+.combinaison {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    font-family: var(--font-heading);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.combinaison-unite {
+    color: var(--color-accent);
+    font-size: 0.5em;
+}
+
+.combinaison-separateur {
+    color: var(--color-neutral-700);
+}
+
+.combinaison--fiche { font-size: 62px; }
+.combinaison--carte { font-size: 38px; }
+.combinaison--ligne { font-size: 34px; }
+
+/* Un réglage qui n'a pas été retenu garde le format, mais pas l'accent. */
+.combinaison--a-regler,
+.combinaison--a-regler .combinaison-unite {
+    color: var(--color-neutral-600);
+}
+
+.a-designer {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+/* ── Notes en étoiles ─────────────────────────────────────────────────── */
+
+.note {
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: var(--color-accent);
+    white-space: nowrap;
+}
+
+.note-vide {
+    color: var(--color-neutral-700);
+}
+
+/* ── Registre des plats ───────────────────────────────────────────────── */
+
+.registre-entete,
+.registre-ligne {
+    display: grid;
+    grid-template-columns: 40px 1fr 260px 140px;
+    gap: 0 24px;
+}
+
+.registre-entete {
+    padding: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-neutral-500);
+}
+
+.registre-ligne {
+    align-items: center;
+    padding: 18px 0;
+}
+
+.numero {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    color: var(--color-neutral-600);
+}
+
+.numero--retenu {
+    color: var(--color-accent);
+}
+
+.plat-nom {
+    font-family: var(--font-heading);
+    font-size: 19px;
+}
+
+.plat-nom a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.plat-meta {
+    font-size: 12px;
+    color: var(--color-neutral-500);
+    margin-top: 3px;
+}
+
+.chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+/* ── Photos ───────────────────────────────────────────────────────────── */
+
+.photo,
+.photo-absente {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.photo-absente {
+    background: repeating-linear-gradient(135deg,
+        var(--color-neutral-900) 0 8px, #1c1e2c 8px 16px);
+    aspect-ratio: 4 / 5;
+}
+
+.photo img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+}
+
+/* ── Messages ─────────────────────────────────────────────────────────── */
+
+.messages {
+    padding: 0 40px;
+}
+
+.liste-messages {
+    list-style: none;
+    margin: 0 0 var(--space-6);
+    padding: 0;
+}
+
+.message {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-accent-800);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+    font-size: 14px;
+}
+
+.message--error {
+    border-color: var(--color-neutral-700);
+}
+
+/* ── Indicateur HTMX ──────────────────────────────────────────────────── */
+
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 150ms ease-in;
+    font-size: 12px;
+    color: var(--color-neutral-500);
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    opacity: 1;
+}
+
+/* ── Accessibilité ────────────────────────────────────────────────────── */
+
+.visuellement-cache {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ── Onglets bas, écrans mobiles ──────────────────────────────────────── */
+
+.onglets {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .entete,
+    .contenu,
+    .messages,
+    .pied-de-page {
+        padding-inline: 22px;
+    }
+
+    .contenu {
+        padding-block: 26px 96px;
+    }
+
+    .navigation {
+        display: none;
+    }
+
+    .onglets {
+        position: fixed;
+        inset: auto 0 0 0;
+        display: flex;
+        justify-content: space-around;
+        gap: var(--space-2);
+        padding: var(--space-3) 22px calc(var(--space-3) + env(safe-area-inset-bottom));
+        background: var(--color-bg);
+        background-image: linear-gradient(to right,
+            transparent, var(--color-divider) 40px,
+            var(--color-divider) calc(100% - 40px), transparent);
+        background-repeat: no-repeat;
+        background-position: top;
+        background-size: 100% 1px;
+    }
+
+    .onglets a {
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        color: var(--color-neutral-400);
+        text-decoration: none;
+    }
+
+    .onglets a.est-actif {
+        color: var(--color-accent);
+    }
+
+    .entete-page {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    h1 { font-size: 30px; }
+
+    .registre-entete {
+        display: none;
+    }
+
+    .registre-ligne {
+        grid-template-columns: 1fr auto;
+        gap: var(--space-2) var(--space-4);
+        padding: 16px 0;
+    }
+
+    .registre-ligne .numero {
+        display: none;
+    }
+
+    .registre-ligne .combinaison {
+        grid-row: span 2;
+        align-self: center;
+        font-size: 26px;
+    }
+
+    .filet-bas {
+        background-image: linear-gradient(to right,
+            transparent, var(--color-divider) 40px,
+            var(--color-divider) calc(100% - 40px), transparent);
+    }
+
+    .input,
+    .seg-opt,
+    .btn {
+        min-height: 46px;
+    }
+}
+
+/* ── Formulaires ──────────────────────────────────────────────────────── */
+
+.field + .field {
+    margin-top: var(--space-6);
+}
+
+.field .aide {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: var(--color-neutral-500);
+}
+
+.field .erreur {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: var(--color-accent-300);
+}
+
+.groupe-cases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+}
+
+.panneau {
+    max-width: 620px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-top: var(--space-8);
+}
+
+/* ── Écran de connexion ───────────────────────────────────────────────── */
+
+.accueil-connexion {
+    display: grid;
+    grid-template-columns: 1fr 520px;
+    gap: 60px;
+    align-items: center;
+    padding: 24px 0 40px;
+}
+
+.titre-accroche {
+    font-size: 52px;
+    line-height: 1.05;
+    margin: 0 0 18px;
+    text-wrap: pretty;
+}
+
+.accroche {
+    font-size: 16px;
+    color: var(--color-neutral-400);
+    margin: 0 0 30px;
+    max-width: 420px;
+    text-wrap: pretty;
+}
+
+.chiffres {
+    display: flex;
+    gap: 34px;
+    font-variant-numeric: tabular-nums;
+}
+
+.chiffre-valeur {
+    font-family: var(--font-heading);
+    font-size: 30px;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.chiffre-valeur--accent {
+    color: var(--color-accent);
+}
+
+/* L'appareil. Purement décoratif : la poignée est collée au bord droit du
+   conteneur, qui réserve sa largeur en padding. */
+.airfryer {
+    position: relative;
+    padding-right: 26px;
+}
+
+.airfryer-poignee {
+    position: absolute;
+    right: 0;
+    top: 168px;
+    width: 26px;
+    height: 96px;
+    border: 1px solid var(--color-divider);
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    background: var(--color-neutral-900);
+}
+
+.airfryer-coque {
+    position: relative;
+    border: 1px solid var(--color-divider);
+    border-radius: 30px 30px 46px 46px;
+    background: linear-gradient(to bottom, var(--color-neutral-900), var(--color-bg) 60%);
+    box-shadow: var(--shadow-lg);
+    padding: 22px 26px 30px;
+}
+
+.airfryer-bandeau {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 20px;
+}
+
+.airfryer-molette {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid var(--color-accent);
+    display: grid;
+    place-items: center;
+    position: relative;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+.airfryer-molette-valeur {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-accent);
+}
+
+.airfryer-molette-repere {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 1px;
+    height: 7px;
+    background: var(--color-accent);
+}
+
+.airfryer-titre {
+    font-family: var(--font-heading);
+    font-size: 17px;
+}
+
+.airfryer-sous-titre {
+    font-size: 13px;
+    color: var(--color-neutral-500);
+}
+
+.airfryer-voyants {
+    margin-left: auto;
+    display: flex;
+    gap: 5px;
+}
+
+.voyant {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-neutral-700);
+}
+
+.voyant--allume {
+    background: var(--color-accent);
+}
+
+.airfryer-panier {
+    border: 1px solid var(--color-divider);
+    border-radius: 12px 12px 22px 22px;
+    padding: 26px 24px 28px;
+    background: color-mix(in srgb, var(--color-text) 3%, transparent);
+}
+
+.airfryer-pieds {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 46px;
+}
+
+.airfryer-pieds span {
+    width: 46px;
+    height: 7px;
+    border-radius: 0 0 6px 6px;
+    background: var(--color-neutral-900);
+}
+
+.lien-oubli {
+    text-align: right;
+    font-size: 13px;
+    margin: var(--space-4) 0 var(--space-6);
+}
+
+.lien-inscription {
+    font-size: 13px;
+    color: var(--color-neutral-500);
+    margin: 18px 0 0;
+    text-align: center;
+}
+
+@media (max-width: 899px) {
+    .accueil-connexion {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+
+    .titre-accroche {
+        font-size: 32px;
+    }
+
+    .airfryer-coque {
+        border-radius: 26px 26px 40px 40px;
+    }
+
+    .airfryer-molette {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+/*
+   Le design system pose `display: block` sur tout label direct d'un `.field`,
+   ce qui écrase le `inline-flex` de `.radio`. On rétablit le composant quand
+   les deux se rencontrent.
+*/
+.field > label.radio {
+    display: inline-flex;
+    margin-bottom: 0;
+    font-size: 14px;
+    color: var(--color-neutral-300);
+}
+
+.ligne-formulaire {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+}
+
+.ligne-formulaire .field + .field {
+    margin-top: 0;
+}

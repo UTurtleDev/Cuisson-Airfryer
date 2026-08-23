@@ -1,0 +1,35 @@
+{% load formulaires %}
+{% comment %}
+    Rendu d'un champ, avec les composants imposés par le design system.
+    Utilisable seul pour les mises en page sur mesure, ou depuis
+    partials/formulaire.html pour un formulaire entier.
+{% endcomment %}
+<div class="field">
+    {% if champ|est_case_a_cocher %}
+        <label class="radio">
+            {{ champ }}<span class="dot"></span>{{ champ.label }}
+        </label>
+    {% elif champ|est_groupe_de_cases %}
+        <label>{{ champ.label }}</label>
+        <div class="groupe-cases">
+            {% for option in champ %}
+                <label class="radio">
+                    {{ option.tag }}<span class="dot"></span>{{ option.choice_label }}
+                </label>
+            {% endfor %}
+        </div>
+    {% elif champ|est_groupe_radio %}
+        <label>{{ champ.label }}</label>
+        <div class="seg">
+            {% for option in champ %}
+                <label class="seg-opt">{{ option.tag }}{{ option.choice_label }}</label>
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ champ.label_tag }}
+        {{ champ }}
+    {% endif %}
+
+    {% if champ.help_text %}<p class="aide">{{ champ.help_text }}</p>{% endif %}
+    {% for erreur in champ.errors %}<p class="erreur">{{ erreur }}</p>{% endfor %}
+</div>

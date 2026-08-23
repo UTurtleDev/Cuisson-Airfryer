@@ -3,8 +3,16 @@
 {% block titre %}Les plats - Carnet de cuisson{% endblock %}
 
 {% block contenu %}
-    <h1>Les plats</h1>
-    <p><a href="{% url 'plats:creer' %}">Ajouter un plat</a></p>
+    <div class="entete-page">
+        <div>
+            <h1>Plats</h1>
+            <p class="sous-titre">
+                Chaque ligne porte la combinaison que la famille a retenue,
+                ou ce qu'il reste à régler.
+            </p>
+        </div>
+        <a class="btn btn-primary" href="{% url 'plats:creer' %}">Ajouter un plat</a>
+    </div>
 
     {% include "plats/partiels/filtres.html" %}
     {% include "plats/partiels/liste_plats.html" %}

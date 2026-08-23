@@ -44,6 +44,7 @@ class ListePlatsView(LoginRequiredMixin, ListView):
     paginate_by = 12
     template_name = "plats/liste.html"
     template_name_fragment = "plats/partiels/liste_plats.html"
+    extra_context = {"rubrique": "plats"}
 
     def get_formulaire(self):
         if not hasattr(self, "_formulaire"):
@@ -77,6 +78,7 @@ class MesPlatsView(LoginRequiredMixin, ListView):
     context_object_name = "plats"
     paginate_by = 12
     template_name = "plats/mes_plats.html"
+    extra_context = {"rubrique": "mes_plats"}
 
     def get_queryset(self):
         return Plat.objects.de(self.request.user).avec_details().avec_favori(self.request.user)
@@ -337,6 +339,7 @@ class ListeFavorisView(LoginRequiredMixin, ListView):
     context_object_name = "plats"
     paginate_by = 12
     template_name = "plats/favoris.html"
+    extra_context = {"rubrique": "favoris"}
 
     def get_queryset(self):
         return (

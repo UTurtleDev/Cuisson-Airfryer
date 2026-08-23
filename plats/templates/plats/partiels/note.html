@@ -1,0 +1,2 @@
+{% comment %}Note en étoiles : pleines en accent, vides en neutre.{% endcomment %}
+<span class="note" title="{{ note }} sur 5">{% for etoile in "12345" %}{% if forloop.counter <= note %}★{% else %}<span class="note-vide">★</span>{% endif %}{% endfor %}</span>

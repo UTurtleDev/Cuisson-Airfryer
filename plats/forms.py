@@ -1,12 +1,14 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
+from principal.formulaires import HabillageNocturneMixin
+
 from plats.models import Categorie, EtapePreparation, Ingredient, Plat, TestCuisson
 
 Utilisateur = get_user_model()
 
 
-class FormulairePlat(forms.ModelForm):
+class FormulairePlat(HabillageNocturneMixin, forms.ModelForm):
     """Création et modification d'un plat."""
 
     categories = forms.ModelMultipleChoiceField(
@@ -35,7 +37,7 @@ class FormulairePlat(forms.ModelForm):
         }
 
 
-class FormulaireTestCuisson(forms.ModelForm):
+class FormulaireTestCuisson(HabillageNocturneMixin, forms.ModelForm):
     """Enregistrement d'un essai de cuisson."""
 
     class Meta:
@@ -52,7 +54,7 @@ class FormulaireTestCuisson(forms.ModelForm):
         }
 
 
-class FormulaireFiltrePlats(forms.Form):
+class FormulaireFiltrePlats(HabillageNocturneMixin, forms.Form):
     """Recherche et filtres de la liste des plats.
 
     Le formulaire porte lui-même la logique de filtrage : la vue reste courte
@@ -144,7 +146,7 @@ class FormulaireFiltrePlats(forms.Form):
         return queryset
 
 
-class FormulaireIngredient(forms.ModelForm):
+class FormulaireIngredient(HabillageNocturneMixin, forms.ModelForm):
     class Meta:
         model = Ingredient
         fields = ["nom", "quantite", "unite"]
@@ -154,7 +156,7 @@ class FormulaireIngredient(forms.ModelForm):
         }
 
 
-class FormulaireEtape(forms.ModelForm):
+class FormulaireEtape(HabillageNocturneMixin, forms.ModelForm):
     class Meta:
         model = EtapePreparation
         fields = ["texte"]
@@ -184,7 +186,7 @@ JeuEtapes = forms.models.inlineformset_factory(
 )
 
 
-class FormulaireAdaptationRecette(forms.Form):
+class FormulaireAdaptationRecette(HabillageNocturneMixin, forms.Form):
     """Choix du nombre de personnes pour l'affichage d'une recette."""
 
     personnes = forms.IntegerField(

@@ -24,3 +24,6 @@ medias/
 
 # Spécification (document de travail privé)
 testcuisson_specification.md
+
+# Livrables de design importés (handoff Claude Design)
+*.zip

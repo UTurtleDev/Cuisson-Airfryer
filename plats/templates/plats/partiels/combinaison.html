@@ -1,0 +1,9 @@
+{% comment %}
+    La combinaison température / durée, signature visuelle du produit.
+    Paramètres : test (obligatoire), taille (fiche, carte ou ligne).
+{% endcomment %}
+<div class="combinaison combinaison--{{ taille|default:'ligne' }}{% if a_regler %} combinaison--a-regler{% endif %}">
+    {{ test.temperature_celsius }}<span class="combinaison-unite">°C</span>
+    <span class="combinaison-separateur">/</span>
+    {{ test.duree_minutes }}<span class="combinaison-unite">min</span>
+</div>

@@ -17,8 +17,10 @@ class PlatQuerySet(models.QuerySet):
 
     def avec_details(self):
         """Précharge propriétaire et catégories pour éviter les requêtes N+1."""
-        return self.select_related("proprietaire", "meilleur_test").prefetch_related(
-            "categories"
+        return (
+            self.select_related("proprietaire", "meilleur_test")
+            .prefetch_related("categories")
+            .avec_dernier_essai()
         )
 
     def recherche(self, terme):
@@ -74,6 +76,23 @@ class PlatQuerySet(models.QuerySet):
                     plat=models.OuterRef("pk"), utilisateur=utilisateur
                 )
             )
+        )
+
+    def avec_dernier_essai(self):
+        """Annote le dernier essai réalisé, pour les plats encore à régler.
+
+        Le registre affiche ce réglage en gris quand aucune combinaison n'est
+        retenue. Sans cette annotation, il faudrait une requête par plat.
+        """
+        from plats.models import TestCuisson
+
+        dernier = TestCuisson.objects.filter(plat=models.OuterRef("pk")).order_by(
+            "-date_test", "-id"
+        )
+        return self.annotate(
+            dernier_temperature=models.Subquery(dernier.values("temperature_celsius")[:1]),
+            dernier_duree=models.Subquery(dernier.values("duree_minutes")[:1]),
+            dernier_note=models.Subquery(dernier.values("note")[:1]),
         )
 
     def avec_meilleur_test(self):
