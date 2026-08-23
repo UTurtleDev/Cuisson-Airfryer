@@ -83,7 +83,12 @@ aucun code métier ne change entre développement et production.
 2. Renseigner `.env` sur le serveur : `DJANGO_DEBUG=False`, `DJANGO_SECRET_KEY`,
    `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL=mysql://utilisateur:motdepasse@localhost:3306/base`,
    `DJANGO_STATIC_ROOT`, `DJANGO_MEDIA_ROOT`.
-3. `pip install -r requirements.txt` (ou `uv export`) dans l'environnement Setup Python App.
+3. `pip install -r requirements.txt` dans l'environnement Setup Python App.
+   Le fichier est généré depuis uv et versionné :
+
+   ```bash
+   uv export --no-hashes --no-dev --format requirements-txt -o requirements.txt
+   ```
 4. `python manage.py migrate`
 5. `python manage.py collectstatic`
 6. `python manage.py createsuperuser`
@@ -91,3 +96,17 @@ aucun code métier ne change entre développement et production.
 
 Le pilote MySQL est fourni par `pymysql`, activé automatiquement dans
 `config/__init__.py`.
+
+### Vérifications avant mise en ligne
+
+Avec les variables de production renseignées :
+
+```bash
+uv run python manage.py check --deploy
+```
+
+En production, `DEBUG=False` active la redirection HTTPS, les cookies sécurisés,
+HSTS, et fait passer les fichiers statiques par le stockage à empreinte de
+WhiteNoise. Il faut donc lancer `collectstatic` **avant** de redémarrer
+l'application : sans le manifeste, chaque page lèverait une erreur sur le
+premier `{% static %}` rencontré.
