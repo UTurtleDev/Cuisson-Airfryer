@@ -124,49 +124,25 @@ application = get_wsgi_application()
 
 ### .htaccess
 
-La racine du projet est aussi la racine web. Sans règles explicites, `.env`,
-`config/settings.py` et la base SQLite de développement seraient
-**téléchargeables par n'importe qui**, puisque la règle de réécriture sert
-directement tout fichier existant.
+**cPanel écrit son propre bloc Passenger** dans le `.htaccess` de la racine,
+entre deux lignes « DO NOT REMOVE ». Ce bloc porte le chemin de l'application et
+l'interpréteur de l'environnement virtuel créé par cPanel, qui se trouve sous
+`/home/COMPTE/virtualenv/...` et non dans le `.venv` du projet. Il ne faut pas
+le remplacer : les règles du projet viennent en dessous.
 
 ```apache
-PassengerEnabled On
-PassengerAppRoot /home/COMPTE/DOMAINE
-PassengerPython /home/COMPTE/DOMAINE/.venv/bin/python
+# ... bloc CLOUDLINUX PASSENGER CONFIGURATION généré par cPanel ...
 
-# --- Protection des fichiers du projet ---
-# À placer avant les règles de réécriture.
-<FilesMatch "\.(env|sqlite3|md|log|toml|lock|cfg|ini)$">
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+<FilesMatch "\.(env|py|sqlite3|md|log|toml|lock|cfg|ini|yml|yaml)$">
     Require all denied
 </FilesMatch>
-
-<FilesMatch "\.py$">
-    Require all denied
-</FilesMatch>
-
-# Passenger a besoin d'atteindre ce point d'entrée.
-<Files "passenger_wsgi.py">
-    Require all granted
-</Files>
 
 RedirectMatch 404 /\.git
 RedirectMatch 404 /\.venv
-
-# --- Fichiers statiques servis par Apache ---
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    # /static/... pointe vers le dossier collecté par collectstatic.
-    RewriteRule ^static/(.*)$ staticfiles/$1 [L]
-
-    # Un fichier ou dossier existant est servi tel quel.
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
-
-    # Tout le reste part vers Django.
-    RewriteRule ^(.*)$ passenger_wsgi.py [QSA,L]
-</IfModule>
 
 <IfModule mod_mime.c>
     AddType text/css .css
@@ -176,9 +152,16 @@ RedirectMatch 404 /\.venv
 </IfModule>
 ```
 
-**Après avoir posé ces règles, vérifier deux choses :** que le site répond
-toujours, et que `https://mon-domaine.fr/.env` renvoie bien une erreur 403 et
-non le contenu du fichier.
+Aucune règle de réécriture : Passenger prend en charge toutes les requêtes de
+l'application. Une règle du type « si le fichier existe, sers-le » est même
+nuisible ici, car elle publie le code source dès que Passenger ne démarre pas.
+
+Les fichiers statiques sont servis par WhiteNoise, à l'intérieur de Django.
+
+**Si la page affiche le contenu de `passenger_wsgi.py`**, Passenger n'a pas pris
+la main : vérifier la présence du bloc cPanel, le chemin de `PassengerPython`,
+le démarrage de l'application, puis le journal indiqué par
+`PassengerAppLogFile`.
 
 Les blocs `<Directory>` ne sont pas acceptés dans un `.htaccess` : Apache ne les
 autorise que dans la configuration du serveur. Pour désactiver Passenger sur un
