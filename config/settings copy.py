@@ -10,19 +10,13 @@ from pathlib import Path
 
 import environ
 
-import pymysql
-pymysql.install_as_MySQLdb()
-
-# Ignorer la vérification de version Django/MySQL
-pymysql.version_info = (2, 2, 1, "final", 0)
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
     DJANGO_ALLOWED_HOSTS=(list, []),
 )
-environ.Env.read_env(str(BASE_DIR / ".env"))
+environ.Env.read_env(BASE_DIR / ".env")
 
 
 # Sécurité
