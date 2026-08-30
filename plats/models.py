@@ -8,6 +8,10 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from plats.managers import PlatQuerySet
+from plats.validateurs import (
+    TAILLE_MAXIMUM_MEGAOCTETS,
+    valider_taille_image,
+)
 
 
 #: Mots commençant par un h aspiré, devant lequel « de » ne s'élide pas.
@@ -82,7 +86,13 @@ class Plat(models.Model):
     nom = models.CharField("nom", max_length=120)
     slug = models.SlugField("identifiant d'URL", max_length=140, unique=True, blank=True)
     description = models.TextField("description", blank=True)
-    image = models.ImageField("image", upload_to="plats/%Y/%m", blank=True)
+    image = models.ImageField(
+        "image",
+        upload_to="plats/%Y/%m",
+        blank=True,
+        validators=[valider_taille_image],
+        help_text=f"Facultative, {TAILLE_MAXIMUM_MEGAOCTETS} Mo maximum.",
+    )
     categories = models.ManyToManyField(
         Categorie,
         verbose_name="catégories",

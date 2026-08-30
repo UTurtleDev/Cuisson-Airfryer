@@ -35,9 +35,9 @@ class FormulairePlat(HabillageNocturneMixin, forms.ModelForm):
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
+            "image": forms.ClearableFileInput(attrs={"accept": "image/*"}),
         }
         help_texts = {
-            "image": "Facultative.",
             "temps_preparation_minutes": "Facultatif, en minutes.",
         }
 
