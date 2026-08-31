@@ -104,13 +104,21 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Base de données
 # Pilotée par DATABASE_URL : sqlite en développement, MySQL/MariaDB en production.
+#
+# En production, la variable est obligatoire et sans valeur de repli. Une
+# base oubliée ferait autrement basculer le site sur un sqlite créé au
+# passage, sans le moindre message : le site fonctionnerait, mais sur une
+# base vide et invisible, pendant que la vraie resterait inutilisée.
 
-DATABASES = {
-    "default": env.db_url(
-        "DATABASE_URL",
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-    )
-}
+if DEBUG:
+    DATABASES = {
+        "default": env.db_url(
+            "DATABASE_URL",
+            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        )
+    }
+else:
+    DATABASES = {"default": env.db_url("DATABASE_URL")}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
