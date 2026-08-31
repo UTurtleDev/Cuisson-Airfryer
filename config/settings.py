@@ -124,9 +124,15 @@ if env.bool("USE_MYSQL", default=False):
             "PASSWORD": env("DB_PASSWORD"),
             "HOST": env("DB_HOST", default="localhost"),
             "PORT": env("DB_PORT", default="3306"),
-            # utf8mb4 pour que les accents et les caractères spéciaux
-            # traversent la base sans dommage.
-            "OPTIONS": {"charset": "utf8mb4"},
+            "OPTIONS": {
+                # utf8mb4 pour que les accents et les caractères spéciaux
+                # traversent la base sans dommage.
+                "charset": "utf8mb4",
+                # Le mode strict n'est pas actif par défaut chez o2switch.
+                # Sans lui, MariaDB tronque une valeur trop longue au lieu
+                # de refuser l'enregistrement, et ne le dit à personne.
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
         }
     }
 elif DEBUG:
