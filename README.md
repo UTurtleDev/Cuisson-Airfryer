@@ -87,25 +87,26 @@ aucun code métier ne change entre développement et production.
    ```ini
    DJANGO_SECRET_KEY=<une chaîne aléatoire de 50 caractères ou plus>
    DJANGO_DEBUG=False
-   DJANGO_ALLOWED_HOSTS=mon-domaine.fr,www.mon-domaine.fr
-   DATABASE_URL=mysql://COMPTE_utilisateur:motdepasse@localhost:3306/COMPTE_base
+   DJANGO_ALLOWED_HOSTS=mon-domaine.fr
    DJANGO_STATIC_ROOT=/home/COMPTE/DOMAINE/staticfiles
    DJANGO_MEDIA_ROOT=/home/COMPTE/DOMAINE/media
    DJANGO_URL_ADMINISTRATION=une-adresse-a-vous/
+
+   USE_MYSQL=True
+   DB_NAME=COMPTE_nomdelabase
+   DB_USER=COMPTE_utilisateur
+   DB_PASSWORD=le-mot-de-passe-tel-quel
+   DB_HOST=localhost
+   DB_PORT=3306
    ```
 
-   Les noms de variables sont préfixés `DJANGO_` et la base passe par une seule
-   `DATABASE_URL`, contrairement au découpage `DB_NAME` / `DB_USER` d'autres
-   projets. Il n'y a pas de variable `USE_MYSQL` : c'est le préfixe de l'URL
-   qui choisit le moteur. Le fichier `.env.exemple` du dépôt fait référence.
+   Une variable par information plutôt qu'une URL de connexion : c'est plus
+   lisible, et le mot de passe n'a aucun caractère à encoder. cPanel préfixe
+   le nom de la base et celui de l'utilisateur avec l'identifiant du compte.
 
-   Deux pièges : cPanel préfixe le nom de la base et celui de l'utilisateur
-   avec l'identifiant du compte, et le mot de passe doit être encodé pour
-   l'URL (`@` devient `%40`, `:` devient `%3A`, `/` devient `%2F`).
-
-   En production, `DATABASE_URL` est **obligatoire** : sans elle, le
-   démarrage échoue avec un message explicite plutôt que de basculer en
-   silence sur un sqlite créé au passage.
+   En production, sqlite est **refusé** : sans `USE_MYSQL=True` et les
+   variables `DB_*`, le démarrage échoue avec un message explicite au lieu de
+   basculer en silence sur une base créée au passage.
 
 3. `pip install -r requirements.txt` dans l'environnement Setup Python App.
 4. `python manage.py migrate`

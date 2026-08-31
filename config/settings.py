@@ -9,6 +9,7 @@ Voir .env.exemple pour la liste des variables attendues.
 from pathlib import Path
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 # Le pilote MySQL est adapté dans config/__init__.py, exécuté avant ce
 # fichier : inutile de le refaire ici.
@@ -103,22 +104,43 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Base de données
-# Pilotée par DATABASE_URL : sqlite en développement, MySQL/MariaDB en production.
 #
-# En production, la variable est obligatoire et sans valeur de repli. Une
-# base oubliée ferait autrement basculer le site sur un sqlite créé au
-# passage, sans le moindre message : le site fonctionnerait, mais sur une
-# base vide et invisible, pendant que la vraie resterait inutilisée.
+# Une variable par information, plutôt qu'une URL unique : c'est plus lisible
+# dans un .env, et surtout le mot de passe n'a aucun caractère à encoder.
+#
+# Développement : rien à écrire, sqlite par défaut.
+# Production    : USE_MYSQL=True et les variables DB_*.
+#
+# En production, sqlite est refusé. Sans ce garde-fou, une variable oubliée
+# ferait basculer le site sur une base créée au passage, vide et invisible,
+# pendant que la vraie resterait inutilisée.
 
-if DEBUG:
+if env.bool("USE_MYSQL", default=False):
     DATABASES = {
-        "default": env.db_url(
-            "DATABASE_URL",
-            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        )
+        "default": {
+            "ENGINE": env("DB_ENGINE", default="django.db.backends.mysql"),
+            "NAME": env("DB_NAME"),
+            "USER": env("DB_USER"),
+            "PASSWORD": env("DB_PASSWORD"),
+            "HOST": env("DB_HOST", default="localhost"),
+            "PORT": env("DB_PORT", default="3306"),
+            # utf8mb4 pour que les accents et les caractères spéciaux
+            # traversent la base sans dommage.
+            "OPTIONS": {"charset": "utf8mb4"},
+        }
+    }
+elif DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
 else:
-    DATABASES = {"default": env.db_url("DATABASE_URL")}
+    raise ImproperlyConfigured(
+        "Base de données non configurée. En production, renseignez USE_MYSQL=True "
+        "ainsi que DB_NAME, DB_USER et DB_PASSWORD dans le fichier .env."
+    )
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
