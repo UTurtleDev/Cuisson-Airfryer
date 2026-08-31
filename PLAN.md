@@ -186,8 +186,8 @@ JavaScript maison : uniquement le menu mobile et l'aperçu d'image avant envoi. 
 
 ### 4.2 Variables d'environnement (`.env`, jamais commité ; `.env.exemple` commité)
 
-`DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, `DJANGO_STATIC_ROOT`, `DJANGO_MEDIA_ROOT`, réglages email.
-`DATABASE_URL` : `sqlite:///db.sqlite3` en local, `mysql://user:mdp@localhost/base` en production. Aucun code métier ne change.
+`DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `USE_MYSQL` et les `DB_*`, `DJANGO_STATIC_ROOT`, `DJANGO_MEDIA_ROOT`, réglages email.
+Base de données : sqlite par défaut en local, `USE_MYSQL=True` et les variables `DB_*` en production, où sqlite est refusé. Aucun code métier ne change.
 
 ### 4.3 o2switch
 
