@@ -32,11 +32,15 @@ LARGEUR_CIBLE = 1000
 
 #: En dessous, on refuse. Le poids du fichier ne dit rien de sa qualité : une
 #: vignette de 92 pixels pèse 3 ko et passerait tous les contrôles de taille,
-#: mais le navigateur devrait l'étirer trois fois pour remplir le cadre. Ce
-#: plancher est la vraie garantie de qualité, la limite de poids n'en est pas
-#: une. 560 pixels, soit deux fois le cadre de 280, donnent un rendu net
-#: jusque sur les écrans à forte densité, où un pixel CSS en vaut deux.
-LARGEUR_MINIMUM = 560
+#: mais le navigateur devrait l'étirer trois fois pour remplir le cadre.
+#:
+#: Le seuil est la largeur exacte du cadre : en dessous, l'image est étirée
+#: même sur un écran ordinaire, et ça se voit. Au-dessus, elle peut rester un
+#: peu douce sur un écran à forte densité, et c'est accepté : la photo illustre
+#: le plat, elle n'est pas là pour être scrutée. Viser le rendu parfait
+#: refuserait quantité d'images correctes, notamment les carrées, qui perdent
+#: un cinquième de leur largeur au recadrage.
+LARGEUR_MINIMUM = 280
 
 #: 82 est le palier où l'œil ne distingue plus la compression sur une photo
 #: de cuisine, alors que le fichier a déjà fondu.

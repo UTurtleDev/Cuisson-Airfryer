@@ -200,7 +200,7 @@ class NormalisationTest(TestCase):
             normaliser_image(photo(92, 92))
         message = capture.exception.messages[0]
         self.assertIn("92 × 92", message)
-        self.assertIn("560", message)
+        self.assertIn("280", message)
 
     def test_panorama_refuse_malgre_sa_largeur(self):
         """Le contrôle porte sur ce qui reste après recadrage, pas sur le brut.
@@ -213,7 +213,16 @@ class NormalisationTest(TestCase):
         self.assertEqual(capture.exception.code, "image_trop_petite")
 
     def test_image_juste_au_plancher_acceptee(self):
-        self.assertEqual(self.dimensions(photo(560, 700)), (560, 700))
+        self.assertEqual(self.dimensions(photo(280, 350)), (280, 350))
+
+    def test_illustration_carree_de_site_de_recettes_acceptee(self):
+        """Le cas courant : une image carrée modeste, glanée en ligne.
+
+        Elle perd un cinquième de sa largeur au recadrage et reste utilisable.
+        Un seuil plus ambitieux la refuserait, alors qu'elle illustre très bien
+        le plat.
+        """
+        self.assertEqual(self.dimensions(photo(554, 554)), (443, 554))
 
     def test_fichier_illisible_signale_proprement(self):
         casse = SimpleUploadedFile("photo.jpg", b"ceci n'est pas une image")
@@ -256,7 +265,7 @@ class EnvoiNormaliseTest(TestCase):
 
     def test_minimum_annonce_sur_le_formulaire(self):
         contenu = self.client.get(reverse("plats:creer")).content.decode()
-        self.assertIn("560 pixels de large", contenu)
+        self.assertIn("280 pixels de large", contenu)
 
     def test_modifier_un_plat_sans_toucher_a_la_photo_la_laisse_intacte(self):
         """Sans nouvel envoi, le champ rend le fichier déjà en base : on n'y retouche pas."""
