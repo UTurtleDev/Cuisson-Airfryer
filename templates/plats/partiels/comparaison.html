@@ -23,7 +23,7 @@
                         Essai n° {{ test.numero }}
                         {% if test.est_meilleur %} · retenu{% endif %}
                     </p>
-                    {% include "plats/partiels/combinaison.html" with test=test taille="carte" %}
+                    {% include "plats/partiels/combinaison.html" with test=test taille="comparaison" %}
                     <p class="text-muted">{{ test.date_test|date:"d/m/Y" }}</p>
                 </div>
             {% endfor %}

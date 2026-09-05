@@ -1,8 +1,14 @@
 {% comment %}
-    Carte d'un plat : la combinaison retenue en tête, puis le nom et les
-    relances. Utilisée sur les favoris.
+    Carte d'un plat : le nom en tête, puis la combinaison retenue et les
+    relances. Le nom passe en premier parce qu'une carte sert d'abord à
+    reconnaître le plat ; la combinaison, elle, se lit une fois qu'on sait de
+    quoi il s'agit. Utilisée sur les favoris, l'accueil et le tableau de bord.
 {% endcomment %}
 <article class="card elev-sm carte-plat">
+    <h3 class="card-title">
+        <a href="{{ plat.get_absolute_url }}">{{ plat.nom }}</a>
+    </h3>
+
     {% if plat.meilleur_test %}
         {% include "plats/partiels/combinaison.html" with test=plat.meilleur_test taille="carte" %}
     {% elif plat.dernier_temperature %}
@@ -14,10 +20,6 @@
     {% else %}
         <p class="text-muted">Aucun essai</p>
     {% endif %}
-
-    <h3 class="card-title">
-        <a href="{{ plat.get_absolute_url }}">{{ plat.nom }}</a>
-    </h3>
 
     <div class="card-meta">
         <span>{{ plat.proprietaire.nom_affiche }}</span>

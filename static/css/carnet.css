@@ -123,8 +123,21 @@
 }
 
 .combinaison--fiche { font-size: 62px; }
-.combinaison--carte { font-size: 38px; }
+.combinaison--comparaison { font-size: 38px; }
 .combinaison--ligne { font-size: 34px; }
+
+/* Sur une carte, la combinaison passe après le nom : elle n'annonce plus le
+   plat, elle le complète. D'où la petite taille. Les unités remontent à
+   0.65em, sinon un « °C » à 8 pixels deviendrait illisible, et l'écart se
+   resserre pour rester proportionné au corps. */
+.combinaison--carte {
+    font-size: 17px;
+    gap: 4px;
+}
+
+.combinaison--carte .combinaison-unite {
+    font-size: 0.65em;
+}
 
 /* Un réglage qui n'a pas été retenu garde le format, mais pas l'accent. */
 .combinaison--a-regler,
@@ -1007,6 +1020,14 @@
 .carte-plat {
     padding: var(--space-6);
     gap: var(--space-3);
+}
+
+/* Le nom prend la taille d'appel que portait la combinaison : sur une grille
+   de cartes, c'est lui qu'on cherche des yeux. */
+.carte-plat .card-title {
+    font-size: 38px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
 }
 
 .carte-plat .card-title a {
