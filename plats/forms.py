@@ -1,14 +1,41 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import UploadedFile
 
 from principal.formulaires import HabillageNocturneMixin
 
+from plats.images import normaliser_image
 from plats.models import Categorie, EtapePreparation, Ingredient, Plat, TestCuisson
+from plats.validateurs import valider_taille_image
 
 Utilisateur = get_user_model()
 
 
-class FormulairePlat(HabillageNocturneMixin, forms.ModelForm):
+class NormalisationImageMixin:
+    """Met la photo envoyée au format d'affichage avant l'enregistrement.
+
+    Le travail se fait au nettoyage du champ : ce que le formulaire pose sur
+    le plat est déjà l'image définitive, et le reste du code (vue, copie de
+    plat, administration) n'a rien à savoir de ce traitement.
+    """
+
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+        # Un champ inchangé rend le fichier déjà en base, une case « effacer »
+        # rend False, un champ vide rend None : dans les trois cas, il n'y a
+        # aucun envoi à retravailler.
+        if not isinstance(image, UploadedFile):
+            return image
+
+        # Le contrôle de poids est refait ici, sur le fichier reçu. Le
+        # validateur du modèle, lui, ne verra plus que l'image allégée : à ce
+        # stade elle est toujours sous la limite, et le garde-fou ne servirait
+        # plus à rien s'il n'était pas posé avant le traitement.
+        valider_taille_image(image)
+        return normaliser_image(image)
+
+
+class FormulairePlat(NormalisationImageMixin, HabillageNocturneMixin, forms.ModelForm):
     """Création et modification d'un plat."""
 
     ajouter_aux_favoris = forms.BooleanField(
@@ -40,6 +67,19 @@ class FormulairePlat(HabillageNocturneMixin, forms.ModelForm):
         help_texts = {
             "temps_preparation_minutes": "Facultatif, en minutes.",
         }
+
+
+class FormulairePlatAdministration(NormalisationImageMixin, forms.ModelForm):
+    """Formulaire des plats dans l'administration.
+
+    Il n'existe que pour brancher la normalisation des photos : une image
+    déposée depuis l'admin doit passer par le même traitement que celle
+    déposée depuis le site, sinon deux plats voisins n'ont pas le même poids.
+    """
+
+    class Meta:
+        model = Plat
+        fields = "__all__"
 
 
 class FormulaireTestCuisson(HabillageNocturneMixin, forms.ModelForm):

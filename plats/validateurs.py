@@ -2,10 +2,12 @@
 
 from django.core.exceptions import ValidationError
 
-#: Au-delà, on refuse. Une photo de téléphone récent pèse 3 à 5 Mo brute ;
-#: la limite laisse donc passer un cliché normal et arrête les envois
-#: manifestement disproportionnés, en attendant un vrai redimensionnement.
-TAILLE_MAXIMUM_MEGAOCTETS = 5
+#: Au-delà, on refuse. La photo envoyée est de toute façon recadrée et
+#: ré-encodée (voir `plats.images`), le fichier gardé ne pèse que quelques
+#: centaines de kilo-octets : la limite ne protège donc plus le disque, elle
+#: protège la mémoire du serveur et évite d'attendre un envoi interminable.
+#: Elle est large exprès, une photo de reflex passe sans discussion.
+TAILLE_MAXIMUM_MEGAOCTETS = 15
 
 TAILLE_MAXIMUM_OCTETS = TAILLE_MAXIMUM_MEGAOCTETS * 1024 * 1024
 

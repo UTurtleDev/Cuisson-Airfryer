@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from plats.forms import FormulairePlatAdministration
 from plats.models import (
     Categorie,
     EtapePreparation,
@@ -48,6 +49,7 @@ class TestCuissonEnLigne(admin.TabularInline):
 
 @admin.register(Plat)
 class PlatAdmin(admin.ModelAdmin):
+    form = FormulairePlatAdministration
     list_display = ["nom", "proprietaire", "meilleur_test", "date_creation", "est_une_copie"]
     list_filter = ["categories", "date_creation"]
     search_fields = ["nom", "description", "proprietaire__email"]

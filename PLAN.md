@@ -91,7 +91,7 @@ Voir §6, point 1 : arbitrage à faire entre modèle et `TextChoices`.
 | `nom` | CharField | |
 | `slug` | SlugField | unique par propriétaire |
 | `description` | TextField(blank) | |
-| `image` | ImageField(blank, upload_to="plats/%Y/%m") | Pillow requis |
+| `image` | ImageField(blank, upload_to="plats/%Y/%m") | Pillow requis, normalisée à l'envoi (voir arbitrage 8) |
 | `categories` | M2M Categorie(blank) | |
 | `nombre_personnes` | PositiveSmallInteger(default=4) | base des recettes |
 | `temps_preparation_minutes` | PositiveSmallInteger(null) | |
@@ -248,3 +248,4 @@ Les lots 0 à 3 constituent la première version réellement utilisable.
 5. **App utilisateurs** : nommée `users` (exception assumée à la règle du code en français, c'est l'habitude du projet). Les modèles et champs à l'intérieur restent en français : `Utilisateur`, `GestionnaireUtilisateur`.
 6. **Tests** : `TestCase` Django natif, aucune dépendance supplémentaire.
 7. **Champs du contrat Django** : `is_active`, `is_staff`, `is_superuser`, ainsi que `create_user` / `create_superuser`, gardent leur nom anglais. Django et son administration s'appuient dessus par nom ; les renommer obligerait à des propriétés de compatibilité fragiles. Leurs libellés affichés sont en français, et des alias `creer_utilisateur` / `creer_superutilisateur` existent pour le code du projet. Tout le reste est en français.
+8. **Photos de plats** : l'image envoyée est recadrée au centre au ratio 4/5 de la fiche, ramenée à 1000 pixels de large et ré-encodée en JPEG qualité 82 avant enregistrement (`plats/images.py`). L'orientation EXIF est appliquée aux pixels, le reste des métadonnées est jeté, et l'original n'est pas conservé : le site n'est pas une photothèque. Une photo de téléphone perd environ 90 % de son poids. Deux garde-fous, à ne pas confondre : la limite de poids (15 Mo, relevée depuis 5) protège la mémoire du serveur et ne dit rien de la qualité ; le plancher de 560 pixels de large **après recadrage** (deux fois le cadre de 280, pour les écrans à forte densité) est, lui, la vraie garantie de rendu. Une vignette de 3 ko passe le premier et échoue au second. On refuse plutôt que d'agrandir : un agrandissement invente du flou.

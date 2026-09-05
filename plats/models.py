@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
+from plats.images import LARGEUR_MINIMUM
 from plats.managers import PlatQuerySet
 from plats.validateurs import (
     TAILLE_MAXIMUM_MEGAOCTETS,
@@ -91,7 +92,11 @@ class Plat(models.Model):
         upload_to="plats/%Y/%m",
         blank=True,
         validators=[valider_taille_image],
-        help_text=f"Facultative, {TAILLE_MAXIMUM_MEGAOCTETS} Mo maximum.",
+        help_text=(
+            "Facultative. Elle est recadrée et allégée automatiquement, inutile "
+            f"de la préparer : au moins {LARGEUR_MINIMUM} pixels de large, "
+            f"{TAILLE_MAXIMUM_MEGAOCTETS} Mo maximum."
+        ),
     )
     categories = models.ManyToManyField(
         Categorie,
